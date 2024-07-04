@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Care | Your Source for Modern Health Information</title>
+
+    <meta name="description"
+        content="Tech Care provides easy-to-understand health information using technology and innovation.">
+
+    <meta property="og:title" content="Tech Care | Your Source for Modern Health Information">
+    <meta property="og:description"
+        content="Tech Care provides easy-to-understand health information using technology and innovation.">
+    <meta property="og:url" content="https://www.yourwebsite.com">
+    <meta property="og:image" content="https://www.yourwebsite.com/path/to/image.jpg">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="icon" href="./assets/images/TestLogo.svg" type="image/x-icon"/>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <div class="logo-contain">
+            <img class="nav-logo" src="./assets/images/TestLogo.svg" alt="">
+        </div>
+        <ul class="nav-links">
+            <li class="link">
+                <button>
+                    <img src="./assets/images/group_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    <p>Overview</p>
+                </button>
+            </li>
+            <li class="link">
+                <button>
+                    <img src="./assets/images/home_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    <p>Patients</p>
+                </button>
+            </li>
+            <li class="link">
+                <button>
+                    <img src="./assets/images/calendar_today_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    <p>Schedule</p>
+                </button>
+            </li>
+            <li class="link">
+                <button>
+                    <img src="./assets/images/chat_bubble_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    <p>Message</p>
+                </button>
+            </li>
+            <li class="link">
+                <button>
+                    <img src="./assets/images/credit_card_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    <p>Transaction</p>
+                </button>
+            </li>
+        </ul>
+
+        <div class="user-info-contain">
+            <div class="user-img">
+                <img src="./assets/images/senior-woman-doctor-and-portrait-smile-for-health-2023-11-27-05-18-16-utc.png"
+                    alt="">
+            </div>
+            <div class="user-name">
+                <p class="primary-text">Dr. Jose Simmons</p>
+                <p class="secondary-text">General Practitioner</p>
+            </div>
+
+            <div class="vl"></div>
+
+            <div class="settings">
+                <div class="img-wrap">
+                    <img src="./assets/images/settings_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                </div>
+                <div class="img-wrap">
+                    <img src="./assets/images/more_vert_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="overview page">
+            Overview
+        </div>
+        <div id="patients" class="patients page">
+            <div class="page-wrap">
+                <div class="side-list">
+                    <div class="header">
+                        <h1>Patients</h1>
+                        <img src="./assets/images/search_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    </div>
+                    <div class="side-list-body">
+                        <div class="side-list-body-wrap">
+                            <ul class="list" id="patient-list">
+                                <!-- List data -->
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="patient-info">
+                    <div class="patient-diagnostics">
+                        <div class="diagnostics-history">
+                            <div class="header">
+                                <h1>Diagnostics History</h1>
+                            </div>
+                            <div class="diagnostics-history-info">
+                                <div class="diagnostics-history-chart">
+                                    <div class="diagnostics-history-chart-wrap">
+                                        <div class="diagnostics-history-chart-head">
+                                            <h1>Blood Pressure</h1>
+                                            <div class="chart-time">
+                                                <p>Last 6 months</p>
+                                                <img src="./assets/images/expand_more_FILL0_wght300_GRAD0_opsz24.svg"
+                                                    alt="">
+                                            </div>
+                                        </div>
+                                        <div id="chart-wrap" class="">
+                                            <div id="chart"></div>
+                                        </div>
+                                    </div>
+                                    <div id="diagnostics-history-chart-details"
+                                        class="diagnostics-history-chart-details">
+                                        <div class="readings">
+                                            <div class="readings-wrap">
+                                                <div class="indicator-systolic"></div>
+                                                <p class="readings-name">Systolic</p>
+                                            </div>
+                                            <p id="systolic-num" class="readings-number"></p>
+                                            <div class="average">
+                                                <img src="./assets/images/ArrowDown.svg" alt="">
+                                                <p id="average-text-systolic">Higher than Average</p>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="readings">
+                                            <div class="readings-wrap">
+                                                <div class="indicator-diastolic"></div>
+                                                <p class="readings-name">Diastolic</p>
+                                            </div>
+                                            <p id="diastolic-num" class="readings-number"></p>
+                                            <div class="average">
+                                                <img src="./assets/images/ArrowDown.svg" alt="">
+                                                <p id="average-text-diastolic">Lower than Average</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="details-wrap">
+                                    <div class="details one">
+                                        <img src="./assets/images/respiratory rate.svg" alt="">
+                                        <div class="details-text">
+                                            <p id="resp-name">Respiratory Rate</p>
+                                            <h1 id="resp-value">20bpm</h1>
+                                        </div>
+                                        <p id="resp-average">Normal</p>
+                                    </div>
+
+                                    <div class="details two">
+                                        <img src="./assets/images/temperature.svg" alt="">
+                                        <div class="details-text">
+                                            <p id="temp-name">Respiratory Rate</p>
+                                            <h1 id="temp-value">98.6°F</h1>
+                                        </div>
+                                        <p id="temp-average">Normal</p>
+                                    </div>
+
+                                    <div class="details three">
+                                        <img src="./assets/images/HeartBPM.svg" alt="">
+                                        <div class="details-text">
+                                            <p id="heart-name">Respiratory Rate</p>
+                                            <h1 id="heart-value">78 bpm</h1>
+                                        </div>
+                                        <div class="details-dropdown-toggle">
+                                            <img src="./assets/images/ArrowDown.svg" alt="">
+                                            <p id="heart-average">Lower than Average</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="diagnostics-list">
+                            <div class="header">
+                                <h1>Diagnostics List</h1>
+                            </div>
+                            <div class="diagnostics">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Problem/Diagnosis</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="diagnosic-list">
+
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="patient-details">
+                        <div class="profile">
+                            <div class="profile-head">
+                                <img id="user-img" src="" alt="">
+                                <h1 id="name"></h1>
+                            </div>
+                            <div class="profile-body">
+                                <div class="profile-body-info">
+                                    <img src="./assets/images/BirthIcon.svg" alt="">
+                                    <div class="profile-body-text">
+                                        <p>Date Of Birth</p>
+                                        <p id="dob"></p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-body-info">
+                                    <img src="./assets/images/FemaleIcon.svg" alt="">
+                                    <div class="profile-body-text">
+                                        <p>Gender</p>
+                                        <p id="gender"></p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-body-info">
+                                    <img src="./assets/images/PhoneIcon.svg" alt="">
+                                    <div class="profile-body-text">
+                                        <p>Contact Info.</p>
+                                        <p id="contact-info"></p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-body-info">
+                                    <img src="./assets/images/PhoneIcon.svg" alt="">
+                                    <div class="profile-body-text">
+                                        <p>Emergency Contacts</p>
+                                        <p id="emergency-contacts"></p>
+                                    </div>
+                                </div>
+
+                                <div class="profile-body-info">
+                                    <img src="./assets/images/InsuranceIcon.svg" alt="">
+                                    <div class="profile-body-text">
+                                        <p>Insurance Provider</p>
+                                        <p id="insurance-provider"></p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <button>Show All Information</button>
+                        </div>
+                        <div class="lab-result">
+                            <div class="header">
+                                <h1>Lab results</h1>
+                            </div>
+                            <div id="results" class="results">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="schedule page ">
+            Schedule
+        </div>
+        <div class="message page ">
+            Message
+        </div>
+        <div class="transaction page ">
+            Transaction
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="./assets/js/index.js"></script>
+</body>
+
+</html>
