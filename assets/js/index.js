@@ -1,320 +1,1079 @@
+// ============================================================
+// UTILITIES
+// ============================================================
 
-// ------- Data Fetching -------
+function refreshIcons() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 
-const username = 'coalition';
-const password = 'skills-test';
+function showToast(message, duration = 2800) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), duration);
+}
+
+// ============================================================
+// DATA FETCHING (external API)
+// ============================================================
+
+const username   = 'coalition';
+const password   = 'skills-test';
 const authString = btoa(`${username}:${password}`);
 
-const headers = {
-    Authorization: `Basic ${authString}`,
-};
-
+let _cachedData = null;
 const fetchData = async () => {
+    if (_cachedData) return _cachedData;
     try {
         const response = await fetch('https://fedskillstest.coalitiontechnologies.workers.dev', {
-            headers: headers,
+            headers: { Authorization: `Basic ${authString}` },
         });
-        if (!response.ok) {
-            throw new Error(`Error Fetching Data: ${response.status}`)
-        }
-        const data = await response.json();
-        console.log('data', data)
-        return data;
-    } catch (error) {
-        console.error('Error: ', error)
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        _cachedData = await response.json();
+        return _cachedData;
+    } catch (e) {
+        console.error('Fetch error:', e);
+        return null;
+    }
+};
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+
+const navlinks = document.querySelectorAll('.nav-links li');
+const pages    = document.querySelectorAll('.container .page');
+
+function resetNav() {
+    pages.forEach(div => div.style.display = 'none');
+    navlinks.forEach(link => {
+        link.querySelector('button').style.backgroundColor = 'transparent';
+        link.querySelector('button').style.borderRadius    = '';
+    });
+}
+
+function activatePage(index) {
+    resetNav();
+    navlinks[index].querySelector('button').style.backgroundColor = 'var(--active1)';
+    navlinks[index].querySelector('button').style.borderRadius    = '40px';
+    pages[index].style.display = 'flex';
+    if (index === 3) {
+        document.body.classList.add('messages-active');
+    } else {
+        document.body.classList.remove('messages-active');
     }
 }
 
-
-// ----- Navigation ------
-
-const navlinks = document.querySelectorAll('.nav-links li')
-const pages = document.querySelectorAll('.container .page')
-
-pages.forEach(div => div.style.display = 'none');
-navlinks.forEach(link => link.style.backgroundColor = 'transparent');
-
-pages[1].style.display = 'flex';
-navlinks[1].style.backgroundColor = 'var(--active1)'
+resetNav();
+// Default: Patients (index 1)
+activatePage(1);
 
 navlinks.forEach((link, index) => {
     link.addEventListener('click', () => {
-        navlinks.forEach(link => link.style.backgroundColor = 'transparent')
-        pages.forEach(div => div.style.display = 'none');
-
-        link.style.backgroundColor = 'var(--active1)'
-        pages[index].style.display = 'flex';
-    })
-})
-
-function removeChartContainer() {
-    const chartContainer = document.querySelector("#chart");
-    if (chartContainer) {
-        chartContainer.parentNode.removeChild(chartContainer);
-    }
-}
-
-
-// ----- Data rendering  -------
-
-const getSelectedPatientData = (data, patientName) => {
-    return data.find(patient => patient.name === patientName);
-};
-
-const chartRender = (patient, updateSelectedData) => {
-
-    const chartDataX = patient.diagnosis_history.map(item => {
-        const month = item.month.slice(0, 3);
-        const monthYearString = `${month}, ${item.year}`;
-        return monthYearString;
+        activatePage(index);
+        if (index === 2) initSchedulePage();
+        if (index === 3) initMessagePage();
+        if (index === 4) initTransactionPage();
     });
-    const neededChartData = chartDataX.slice(0, 6)
-    const labels = [60, 80, 100, 120, 140, 160, 180]
+});
 
-    console.log('chartdataX', neededChartData)
+// ============================================================
+// LOGIN / AUTH
+// ============================================================
 
-    const diagnisticsData = patient.diagnosis_history.map(item => {
-        return item;
-    })
+const loginScreen = document.getElementById('login-screen');
+const loginBtn    = document.getElementById('login-btn');
+const loginEmail  = document.getElementById('login-email');
+const loginPw     = document.getElementById('login-password');
+const loginError  = document.getElementById('login-error');
 
-    const systolicData = diagnisticsData.map(data => data?.blood_pressure?.systolic?.value).splice(-6)
-    const diastolicData = diagnisticsData.map(data => data?.blood_pressure?.diastolic?.value).splice(-6)
-
-    var options = {
-        chart: {
-            type: 'line',
-            height: '200px',
-            width: '100%',
-            toolbar: {
-                show: false
-            },
-            events: {
-                dataPointSelection: function (event, chartContext, config) {
-                    const index = config.dataPointIndex;
-                    updateSelectedData(index);
-                }
-            },
-            zoom: {
-                enabled: true
-            }
-        },
-        tooltip: {
-            intersect: true,
-            shared: false,
-        },
-        series: [{
-            name: 'Systolic',
-            data: systolicData,
-            color: "#E66FD2"
-        },
-        {
-            name: 'Diastolic',
-            data: diastolicData,
-            color: "#8C6FE6"
-        }],
-        xaxis: {
-            categories: neededChartData,
-            labels: {
-                style: {
-                    fontSize: '8px',
-                }
-            }
-        },
-        yaxis: {
-            min: Math.min(...labels),
-            max: Math.max(...labels),
-            tickAmount: labels.length - 1,
-            labels: {
-                formatter: function (value) {
-                    let closest = labels.reduce((prev, curr) => {
-                        return (Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev);
-                    });
-                    return closest;
-                }
-            }
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 2,
-        },
-        markers: {
-            size: 5,
-        },
-        legend: {
-            show: false,
-        }
-    }
-
-    removeChartContainer()
-    // var chart = new ApexCharts(document.querySelector("#chart"), options);
-    const chartContain = document.getElementById('chart-wrap')
-    const newChartContainer = document.createElement("div");
-    newChartContainer.id = "chart";
-    chartContain.appendChild(newChartContainer);
-
-    const newChart = new ApexCharts(newChartContainer, options);
-    newChart.render();
+function showLogin() {
+    loginScreen.classList.remove('hidden');
+    loginScreen.style.display = 'flex';
 }
 
-const updatePageWithPatientData = (patient) => {
+function hideLogin() {
+    loginScreen.classList.add('hidden');
+    loginScreen.style.display = 'none';
+}
 
+// Password eye toggle
+document.getElementById('pw-toggle').addEventListener('click', () => {
+    const isText = loginPw.type === 'text';
+    loginPw.type = isText ? 'password' : 'text';
+    document.getElementById('pw-toggle').innerHTML = isText
+        ? '<i data-lucide="eye"></i>'
+        : '<i data-lucide="eye-off"></i>';
+    refreshIcons();
+});
 
-    const diagnisticsData = patient.diagnosis_history.map(item => {
-        return item;
-    })
+loginBtn.addEventListener('click', async () => {
+    const email = loginEmail.value.trim();
+    const pw    = loginPw.value;
+    if (!email || !pw) { showLoginError('Please enter your email and password.'); return; }
 
-
-    const updateSelectedData = (index) => {
-        document.getElementById('systolic-num').textContent = diagnisticsData[index]?.blood_pressure?.systolic?.value;
-        document.getElementById('diastolic-num').textContent = diagnisticsData[index]?.blood_pressure?.diastolic?.value;
-        document.getElementById('average-text-systolic').textContent = diagnisticsData[index]?.blood_pressure?.systolic?.levels;
-        document.getElementById('average-text-diastolic').textContent = diagnisticsData[index]?.blood_pressure?.diastolic?.levels;
-        document.getElementById('resp-value').textContent = diagnisticsData[index]?.respiratory_rate?.value
-        document.getElementById('resp-average').textContent = diagnisticsData[index]?.respiratory_rate?.levels
-        document.getElementById('temp-value').textContent = diagnisticsData[index]?.temperature?.value
-        document.getElementById('temp-average').textContent = diagnisticsData[index]?.temperature?.levels
-        document.getElementById('heart-value').textContent = diagnisticsData[index]?.heart_rate?.value
-        document.getElementById('heart-average').textContent = diagnisticsData[index]?.heart_rate?.levels
-
-    };
-
-
-    if (diagnisticsData.length > 0) {
-        updateSelectedData(0);
-    }
-
-
-
-    const diagnosticsList = document.getElementById('diagnosic-list')
-
-    patient.diagnostic_list.forEach((item, index) => {
-        const tableRow = document.createElement('tr')
-        const column1 = document.createElement('td')
-        column1.textContent = item.name
-        const column2 = document.createElement('td')
-        column2.textContent = item.description
-        const column3 = document.createElement('td')
-        column3.textContent = item.status
-
-        tableRow.appendChild(column1)
-        tableRow.appendChild(column2)
-        tableRow.appendChild(column3)
-
-        diagnosticsList.appendChild(tableRow)
-    })
-
-    document.getElementById('user-img').src = patient.profile_picture
-    document.getElementById('name').textContent = patient.name
-    document.getElementById('dob').textContent = patient.date_of_birth
-    document.getElementById('gender').textContent = patient.gender
-    document.getElementById('contact-info').textContent = patient.phone_number
-    document.getElementById('emergency-contacts').textContent = patient.emergency_contact
-    document.getElementById('insurance-provider').textContent = patient.insurance_type
-
-    const labResult = document.getElementById('results')
-    labResult.innerHTML = ''
-
-    patient.lab_results.forEach((item, index) => {
-        const result = document.createElement('div')
-        result.classList.add('result')
-
-        const resultName = document.createElement('p')
-        resultName.textContent = item
-        const downloadImg = document.createElement('img')
-        downloadImg.src = '../assets/images/download_FILL0_wght300_GRAD0_opsz24 (1).svg'
-
-        result.appendChild(resultName)
-        result.appendChild(downloadImg)
-        labResult.appendChild(result)
-    })
-
-    chartRender(patient, updateSelectedData)
-};
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const patientName = 'Jessica Taylor';
-    const data = await fetchData();
-
-    if (data) {
-        const selectedPatient = getSelectedPatientData(data, patientName);
-
-        if (selectedPatient) {
-            console.log('Selected Patient:', selectedPatient);
-            updatePageWithPatientData(selectedPatient);
-        } else {
-            console.error('Patient not found');
-        }
-    } else {
-        console.error('No data fetched');
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in…';
+    try {
+        const { profile } = await TechCareAuth.login(email, pw);
+        loginError.classList.add('hidden');
+        hideLogin();
+        applyProfileToUI(profile);
+        await initMainApp();
+        showToast(`Welcome back, ${profile?.name || 'Doctor'}!`);
+    } catch (err) {
+        showLoginError(err.message);
+    } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
     }
 });
 
+loginPw.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
 
+function showLoginError(msg) {
+    loginError.textContent = msg;
+    loginError.classList.remove('hidden');
+}
 
-const displayData = async () => {
+// ============================================================
+// APP BOOTSTRAP
+// ============================================================
 
-    const patientList = document.getElementById('patient-list');
+async function bootApp() {
+    await TechCareDB.init();
+    const auth = await TechCareAuth.isAuthenticated();
+    if (auth) {
+        hideLogin();
+        const profile = await TechCareDB.getProfile();
+        if (profile) applyProfileToUI(profile);
+        await initMainApp();
+    } else {
+        showLogin();
+    }
+}
 
-    patientList.innerHTML = '';
+function applyProfileToUI(profile) {
+    if (!profile) return;
+    document.querySelectorAll('.user-name .primary-text').forEach(el => el.textContent = profile.name);
+    document.querySelector('.dropdown-name') && (document.querySelector('.dropdown-name').textContent = profile.name);
+}
 
-    const data = await fetchData()
+async function initMainApp() {
+    await displayData();
+    const data = await fetchData();
+    if (data) {
+        const selected = getSelectedPatientData(data, 'Jessica Taylor') || data[3] || data[0];
+        if (selected) updatePageWithPatientData(selected);
+    }
+}
 
-    data.forEach((item, index) => {
-        const patientItem = document.createElement('li');
-        patientItem.classList.add('list-item')
+// ============================================================
+// USER DROPDOWN
+// ============================================================
 
-        const listWrap = document.createElement('div')
-        listWrap.classList.add('li-wrap')
-        // Create list items
-        const listImg = document.createElement('img');
-        listImg.classList.add('li-img')
-        listImg.src = item.profile_picture;
+const dropdownBtn = document.getElementById('user-dropdown-btn');
+const dropdown    = document.getElementById('user-dropdown');
 
-        const listName = document.createElement('div');
+dropdownBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('hidden');
+});
 
-        listName.classList.add('li-name')
-        // list name component
-        const listText1 = document.createElement('p');
-        listText1.textContent = item.name;
+document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== dropdownBtn) {
+        dropdown.classList.add('hidden');
+    }
+});
 
-        const listText2 = document.createElement('p');
-        listText2.textContent = `${item.gender}, ${item.age}`;
+document.getElementById('dd-profile').addEventListener('click', () => {
+    dropdown.classList.add('hidden');
+    openProfileOverlay();
+});
 
-        patientItem.appendChild(listWrap);
-        listWrap.appendChild(listImg);
-        listWrap.appendChild(listName);
+document.getElementById('dd-appointments').addEventListener('click', () => {
+    dropdown.classList.add('hidden');
+    activatePage(2);
+    initSchedulePage();
+});
 
-        listName.appendChild(listText1);
-        listName.appendChild(listText2);
+document.getElementById('dd-settings-link').addEventListener('click', () => {
+    dropdown.classList.add('hidden');
+    openSettingsModal();
+});
 
+document.getElementById('dd-help').addEventListener('click', () => {
+    dropdown.classList.add('hidden');
+    openHelpOverlay();
+});
 
-        patientItem.addEventListener('click', () => {
-            handlePatientClick(item.name, data);
+document.getElementById('dd-logout').addEventListener('click', async () => {
+    dropdown.classList.add('hidden');
+    await TechCareAuth.logout();
+    showLogin();
+    showToast('You have been signed out.');
+});
 
+// ============================================================
+// SETTINGS MODAL
+// ============================================================
 
+const settingsBtn      = document.getElementById('settings-btn');
+const settingsModal    = document.getElementById('settings-modal');
+const settingsClose    = document.getElementById('settings-close');
+const settingsNavItems = document.querySelectorAll('.settings-nav-item');
+const settingsTabs     = document.querySelectorAll('.settings-tab');
+
+function openSettingsModal() { settingsModal.classList.remove('hidden'); }
+settingsBtn.addEventListener('click', openSettingsModal);
+settingsClose.addEventListener('click', () => settingsModal.classList.add('hidden'));
+settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) settingsModal.classList.add('hidden'); });
+
+settingsNavItems.forEach(item => {
+    item.addEventListener('click', () => {
+        settingsNavItems.forEach(i => i.classList.remove('active'));
+        settingsTabs.forEach(t => t.classList.remove('active'));
+        item.classList.add('active');
+        document.getElementById(item.dataset.tab).classList.add('active');
+    });
+});
+
+document.getElementById('save-profile-btn').addEventListener('click', async () => {
+    const profile = await TechCareDB.getProfile() || {};
+    profile.name      = document.getElementById('settings-name').value;
+    profile.specialty = document.getElementById('settings-specialty').value;
+    profile.email     = document.getElementById('settings-email').value;
+    profile.phone     = document.getElementById('settings-phone').value;
+    await TechCareDB.saveProfile(profile);
+    applyProfileToUI(profile);
+    showToast('Profile saved successfully!');
+});
+
+document.getElementById('theme-select').addEventListener('change', (e) => {
+    if (e.target.value === 'dark') { showToast('Dark mode coming soon!'); e.target.value = 'light'; }
+});
+
+// ============================================================
+// PROFILE OVERLAY
+// ============================================================
+
+const profileOverlay = document.getElementById('profile-overlay');
+
+async function openProfileOverlay() {
+    profileOverlay.classList.remove('hidden');
+    profileOverlay.style.display = 'flex';
+    refreshIcons();
+    const profile = await TechCareDB.getProfile();
+    if (!profile) return;
+
+    // Hero
+    document.getElementById('profile-hero-name').textContent      = profile.name;
+    document.getElementById('profile-hero-specialty').textContent  = profile.specialty;
+    document.getElementById('profile-hero-email').innerHTML        =
+        `<i data-lucide="mail" style="width:13px;height:13px;vertical-align:middle;"></i> ${profile.email}`;
+    document.getElementById('profile-avatar').src                  = profile.photo;
+
+    // Form
+    document.getElementById('p-name').value      = profile.name       || '';
+    document.getElementById('p-specialty').value = profile.specialty  || '';
+    document.getElementById('p-email').value     = profile.email      || '';
+    document.getElementById('p-phone').value     = profile.phone      || '';
+    document.getElementById('p-bio').value       = profile.bio        || '';
+    document.getElementById('p-address').value   = profile.address    || '';
+    const deptSel = document.getElementById('p-dept');
+    if (profile.department) {
+        [...deptSel.options].forEach(o => { o.selected = o.text === profile.department; });
+    }
+
+    // Session info
+    const session = await TechCareAuth.getSession();
+    if (session) {
+        document.getElementById('sec-session-email').textContent = session.email;
+        const d = new Date(session.loginTime);
+        document.getElementById('sec-session-time').textContent  =
+            d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' at ' +
+            d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Activity feed
+    const apptAll = await TechCareDB.getAllAppointments();
+    const activityList = document.getElementById('profile-activity-list');
+    activityList.innerHTML = '';
+    const recentAppts = apptAll.slice(-5).reverse();
+    if (recentAppts.length === 0) {
+        activityList.innerHTML = '<p class="secondary-text">No recent activity.</p>';
+    } else {
+        recentAppts.forEach(a => {
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.innerHTML = `<div class="activity-dot dot-teal"></div>
+                <div class="activity-text">
+                    <p class="activity-main">Appointment booked — <strong>${a.patient}</strong></p>
+                    <p class="activity-time">${a.dateKey} at ${a.time} ${a.ampm}</p>
+                </div>`;
+            activityList.appendChild(item);
         });
-        patientList.appendChild(patientItem);
+    }
 
+    refreshIcons();
+}
+
+document.getElementById('profile-back').addEventListener('click', () => {
+    profileOverlay.classList.add('hidden');
+    profileOverlay.style.display = 'none';
+});
+
+// Profile tabs
+document.querySelectorAll('.profile-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.profile-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.profile-tab-content').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('ptab-' + btn.dataset.ptab).classList.add('active');
+    });
+});
+
+// Save profile (full form)
+document.getElementById('save-profile-full-btn').addEventListener('click', async () => {
+    const profile = await TechCareDB.getProfile() || {};
+    profile.name       = document.getElementById('p-name').value;
+    profile.specialty  = document.getElementById('p-specialty').value;
+    profile.email      = document.getElementById('p-email').value;
+    profile.phone      = document.getElementById('p-phone').value;
+    profile.bio        = document.getElementById('p-bio').value;
+    profile.address    = document.getElementById('p-address').value;
+    profile.department = document.getElementById('p-dept').value;
+    await TechCareDB.saveProfile(profile);
+    applyProfileToUI(profile);
+    // Sync settings modal inputs too
+    document.getElementById('settings-name').value      = profile.name;
+    document.getElementById('settings-specialty').value = profile.specialty;
+    document.getElementById('settings-email').value     = profile.email;
+    document.getElementById('settings-phone').value     = profile.phone;
+    // Update hero
+    document.getElementById('profile-hero-name').textContent     = profile.name;
+    document.getElementById('profile-hero-specialty').textContent = profile.specialty;
+    showToast('Profile updated successfully!');
+});
+
+// Change password
+document.getElementById('change-pw-btn').addEventListener('click', async () => {
+    const cur  = document.getElementById('sec-current-pw').value;
+    const nw   = document.getElementById('sec-new-pw').value;
+    const conf = document.getElementById('sec-confirm-pw').value;
+    if (!cur || !nw || !conf) { showToast('Please fill in all password fields.'); return; }
+    if (nw !== conf)          { showToast('New passwords do not match.'); return; }
+    if (nw.length < 8)        { showToast('Password must be at least 8 characters.'); return; }
+    try {
+        await TechCareAuth.changePassword(cur, nw);
+        document.getElementById('sec-current-pw').value = '';
+        document.getElementById('sec-new-pw').value     = '';
+        document.getElementById('sec-confirm-pw').value = '';
+        showToast('Password updated successfully!');
+    } catch (err) {
+        showToast(err.message);
+    }
+});
+
+document.getElementById('sec-logout-all').addEventListener('click', async () => {
+    await TechCareAuth.logout();
+    profileOverlay.classList.add('hidden');
+    profileOverlay.style.display = 'none';
+    showLogin();
+    showToast('Signed out of all devices.');
+});
+
+// ============================================================
+// HELP & SUPPORT OVERLAY
+// ============================================================
+
+const helpOverlay = document.getElementById('help-overlay');
+
+const FAQ_DATA = [
+    { q: 'How do I add a new appointment?', a: 'Navigate to the Schedule tab and click the "+ New" button. Fill in the patient\'s name, date, time, and appointment type, then click "Book Appointment". The appointment will appear in the day view immediately.' },
+    { q: 'Can I message patients directly?', a: 'Yes! Navigate to the Messages tab to see all patient conversations. Click on a patient name to open the chat window. Type your message and press Send or hit Enter.' },
+    { q: 'How do I export transaction records?', a: 'Go to the Transactions tab and click the "Export" button in the top-right of the table. You can also filter by status (Paid, Pending, Refunded) before exporting.' },
+    { q: 'How do I update my profile information?', a: 'Click the three-dot menu (⋮) in the top-right of the navbar, select "My Profile", then edit your details in the Personal Info tab and click "Save Changes".' },
+    { q: 'Is my patient data secure?', a: 'Yes. TechCare uses industry-standard AES-256 encryption and is fully HIPAA compliant. All patient data is stored locally in IndexedDB and never transmitted to third parties without explicit consent.' },
+    { q: 'How do I change my password?', a: 'Go to My Profile → Security tab. Enter your current password, then your new password twice, and click "Update Password".' },
+    { q: 'How do I view a patient\'s full medical history?', a: 'Click on a patient\'s name in the Patients tab to load their profile. You\'ll see their diagnostics history, blood pressure chart, lab results, and diagnostic list.' },
+    { q: 'Can I cancel or delete an appointment?', a: 'Yes. In the Schedule tab, click on any appointment entry. A delete option will appear. Only appointments you created through the system can be deleted.' },
+    { q: 'What browsers are supported?', a: 'TechCare works on all modern browsers including Chrome, Firefox, Safari, and Edge. We recommend keeping your browser up to date for the best experience.' },
+    { q: 'How do I contact technical support?', a: 'Use the contact form on this Help & Support page, or email support@techcare.io. Our team responds within 2 business hours.' },
+];
+
+function openHelpOverlay() {
+    helpOverlay.classList.remove('hidden');
+    helpOverlay.style.display = 'flex';
+    renderFAQ(FAQ_DATA);
+    refreshIcons();
+}
+
+document.getElementById('help-back').addEventListener('click', () => {
+    helpOverlay.classList.add('hidden');
+    helpOverlay.style.display = 'none';
+});
+
+function renderFAQ(faqs) {
+    const list = document.getElementById('faq-list');
+    list.innerHTML = '';
+    faqs.forEach((item, i) => {
+        const el = document.createElement('div');
+        el.className = 'faq-item';
+        el.innerHTML = `
+            <button class="faq-q" data-i="${i}">
+                <span>${item.q}</span>
+                <i data-lucide="chevron-down" class="faq-chevron"></i>
+            </button>
+            <div class="faq-a" id="faq-a-${i}">${item.a}</div>`;
+        list.appendChild(el);
+    });
+    refreshIcons();
+
+    // Accordion toggle
+    list.querySelectorAll('.faq-q').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idx    = btn.dataset.i;
+            const answer = document.getElementById('faq-a-' + idx);
+            const isOpen = answer.classList.contains('open');
+            list.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+            list.querySelectorAll('.faq-chevron').forEach(c => c.classList.remove('rotated'));
+            if (!isOpen) {
+                answer.classList.add('open');
+                btn.querySelector('.faq-chevron').classList.add('rotated');
+            }
+        });
+    });
+}
+
+// FAQ search
+document.getElementById('help-search-input').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = FAQ_DATA.filter(f =>
+        f.q.toLowerCase().includes(q) || f.a.toLowerCase().includes(q)
+    );
+    renderFAQ(filtered);
+});
+
+// Help submit
+document.getElementById('help-submit-btn').addEventListener('click', () => {
+    const subject = document.getElementById('help-subject').value.trim();
+    const msg     = document.getElementById('help-message').value.trim();
+    if (!subject || !msg) { showToast('Please fill in the subject and message.'); return; }
+    document.getElementById('help-subject').value  = '';
+    document.getElementById('help-message').value  = '';
+    showToast('Support request submitted! We\'ll respond within 2 business hours.');
+});
+
+// Quick link cards
+document.querySelectorAll('.help-quick-card').forEach((card, i) => {
+    card.addEventListener('click', () => {
+        const topics = ['appointment', 'message', 'transaction', 'privacy'];
+        const filtered = FAQ_DATA.filter(f => f.q.toLowerCase().includes(topics[i]) || f.a.toLowerCase().includes(topics[i]));
+        renderFAQ(filtered.length ? filtered : FAQ_DATA);
+        document.querySelector('.help-section').scrollIntoView({ behavior: 'smooth' });
+    });
+});
+
+// ============================================================
+// PATIENTS PAGE
+// ============================================================
+
+function removeChartContainer() {
+    const el = document.querySelector('#chart');
+    if (el) el.parentNode.removeChild(el);
+}
+
+const getSelectedPatientData = (data, name) => data.find(p => p.name === name);
+
+const chartRender = (patient, updateSelectedData) => {
+    const chartDataX     = patient.diagnosis_history.map(item => `${item.month.slice(0, 3)}, ${item.year}`);
+    const neededChartData = chartDataX.slice(0, 6);
+    const labels          = [60, 80, 100, 120, 140, 160, 180];
+    const diagData        = patient.diagnosis_history;
+    const systolicData    = diagData.map(d => d?.blood_pressure?.systolic?.value).splice(-6);
+    const diastolicData   = diagData.map(d => d?.blood_pressure?.diastolic?.value).splice(-6);
+
+    const options = {
+        chart: {
+            type: 'line', height: '200px', width: '100%',
+            toolbar: { show: false },
+            events: { dataPointSelection: (_e, _c, cfg) => updateSelectedData(cfg.dataPointIndex) },
+            zoom: { enabled: true }
+        },
+        tooltip: { intersect: true, shared: false },
+        series: [
+            { name: 'Systolic',  data: systolicData,  color: '#E66FD2' },
+            { name: 'Diastolic', data: diastolicData, color: '#8C6FE6' }
+        ],
+        xaxis: { categories: neededChartData, labels: { style: { fontSize: '8px' } } },
+        yaxis: {
+            min: Math.min(...labels), max: Math.max(...labels),
+            tickAmount: labels.length - 1,
+            labels: { formatter: v => labels.reduce((p, c) => Math.abs(c - v) < Math.abs(p - v) ? c : p) }
+        },
+        stroke:  { curve: 'smooth', width: 2 },
+        markers: { size: 5 },
+        legend:  { show: false }
+    };
+
+    removeChartContainer();
+    const wrap = document.getElementById('chart-wrap');
+    const div  = document.createElement('div');
+    div.id = 'chart';
+    wrap.appendChild(div);
+    new ApexCharts(div, options).render();
+};
+
+const updatePageWithPatientData = (patient) => {
+    const diagData = patient.diagnosis_history;
+
+    const updateSelectedData = (index) => {
+        document.getElementById('systolic-num').textContent         = diagData[index]?.blood_pressure?.systolic?.value;
+        document.getElementById('diastolic-num').textContent        = diagData[index]?.blood_pressure?.diastolic?.value;
+        document.getElementById('average-text-systolic').textContent = diagData[index]?.blood_pressure?.systolic?.levels;
+        document.getElementById('average-text-diastolic').textContent= diagData[index]?.blood_pressure?.diastolic?.levels;
+        document.getElementById('resp-value').textContent           = diagData[index]?.respiratory_rate?.value;
+        document.getElementById('resp-average').textContent         = diagData[index]?.respiratory_rate?.levels;
+        document.getElementById('temp-value').textContent           = diagData[index]?.temperature?.value;
+        document.getElementById('temp-average').textContent         = diagData[index]?.temperature?.levels;
+        document.getElementById('heart-value').textContent          = diagData[index]?.heart_rate?.value;
+        document.getElementById('heart-average').textContent        = diagData[index]?.heart_rate?.levels;
+    };
+
+    if (diagData.length > 0) updateSelectedData(0);
+
+    const dList = document.getElementById('diagnosic-list');
+    dList.innerHTML = '';
+    patient.diagnostic_list.forEach(item => {
+        const tr = document.createElement('tr');
+        ['name', 'description', 'status'].forEach(k => {
+            const td = document.createElement('td');
+            td.textContent = item[k];
+            tr.appendChild(td);
+        });
+        dList.appendChild(tr);
     });
 
-    const patientlists = document.querySelectorAll('.list-item')
-    patientlists[3].style.backgroundColor = 'var(--active2)';
+    document.getElementById('user-img').src               = patient.profile_picture;
+    document.getElementById('name').textContent            = patient.name;
+    document.getElementById('dob').textContent             = patient.date_of_birth;
+    document.getElementById('gender').textContent          = patient.gender;
+    document.getElementById('contact-info').textContent    = patient.phone_number;
+    document.getElementById('emergency-contacts').textContent = patient.emergency_contact;
+    document.getElementById('insurance-provider').textContent = patient.insurance_type;
 
-    patientlists.forEach((list, index) => {
-        list.addEventListener('click', () => {
-            patientlists.forEach(list => list.style.backgroundColor = 'transparent')
-            list.style.backgroundColor = 'var(--active2)'
-        })
-    })
+    const results = document.getElementById('results');
+    results.innerHTML = '';
+    patient.lab_results.forEach(item => {
+        const div  = document.createElement('div');
+        div.className = 'result';
+        const p   = document.createElement('p');
+        p.textContent = item;
+        const img = document.createElement('img');
+        img.src = './assets/images/download_FILL0_wght300_GRAD0_opsz24 (1).svg';
+        img.style.width = '14px';
+        div.appendChild(p);
+        div.appendChild(img);
+        results.appendChild(div);
+    });
 
+    chartRender(patient, updateSelectedData);
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    fetchData(); // Pre-load in background
+    await bootApp();
+});
+
+const displayData = async () => {
+    const patientList = document.getElementById('patient-list');
+    patientList.innerHTML = '';
+    const data = await fetchData();
+    if (!data) return;
+
+    data.forEach(item => {
+        const li  = document.createElement('li');
+        li.className = 'list-item';
+        if (item.name === 'Jessica Taylor') {
+            li.style.backgroundColor = 'var(--active2)';
+        }
+        const wrap = document.createElement('div');
+        wrap.className = 'li-wrap';
+        const img  = document.createElement('img');
+        img.className = 'li-img';
+        img.src = item.profile_picture;
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'li-name';
+        const p1 = document.createElement('p');
+        p1.textContent = item.name;
+        p1.className = 'primary-text';
+        const p2 = document.createElement('p');
+        p2.textContent = `${item.gender}, ${item.age}`;
+        nameDiv.appendChild(p1);
+        nameDiv.appendChild(p2);
+        wrap.appendChild(img);
+        wrap.appendChild(nameDiv);
+        li.appendChild(wrap);
+        li.addEventListener('click', () => {
+            patientList.querySelectorAll('.list-item').forEach(x => x.style.backgroundColor = 'transparent');
+            li.style.backgroundColor = 'var(--active2)';
+            handlePatientClick(item.name, data);
+        });
+        patientList.appendChild(li);
+    });
+
+    // Populate appointment datalist
+    const dl = document.getElementById('appt-patient-list');
+    if (dl) {
+        dl.innerHTML = '';
+        data.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            dl.appendChild(opt);
+        });
+    }
+};
+
+const handlePatientClick = (name, data) => {
+    const p = data.find(x => x.name === name);
+    if (p) updatePageWithPatientData(p);
+};
+
+// ============================================================
+// SCHEDULE PAGE
+// ============================================================
+
+let calCurrentDate = new Date(2026, 9, 2);
+let scheduleInitialized = false;
+
+const APPT_TYPE_COLORS = {
+    'Check-up':    '#01F0D0',
+    'Follow-up':   '#8C6FE6',
+    'Lab Review':  '#E66FD2',
+    'Consultation':'#FFB347',
+    'New Patient': '#6FA8E6',
+};
+
+// Seeded hard-coded appointments (baseline)
+const baseAppointmentsData = {
+    '2026-10-02': [
+        { time: '09:00', ampm: 'AM', patient: 'Emily Clarke',     type: 'Check-up',    color: '#01F0D0' },
+        { time: '10:30', ampm: 'AM', patient: 'Nathan Evens',     type: 'Follow-up',   color: '#8C6FE6' },
+        { time: '12:00', ampm: 'PM', patient: 'Samantha Johnson', type: 'Lab Review',  color: '#E66FD2' },
+        { time: '02:00', ampm: 'PM', patient: 'Kevin Anderson',   type: 'Consultation',color: '#FFB347' },
+        { time: '03:30', ampm: 'PM', patient: 'Olivia Brown',     type: 'New Patient', color: '#6FA8E6' },
+    ],
+    '2026-10-05': [
+        { time: '10:00', ampm: 'AM', patient: 'Tyler Davis',      type: 'Check-up',    color: '#01F0D0' },
+        { time: '01:00', ampm: 'PM', patient: 'Dylan Thompson',   type: 'Follow-up',   color: '#8C6FE6' },
+    ],
+    '2026-10-09': [
+        { time: '09:00', ampm: 'AM', patient: 'Mike Nolan',       type: 'Lab Review',  color: '#E66FD2' },
+    ],
+    '2026-10-14': [
+        { time: '11:00', ampm: 'AM', patient: 'John Martinez',    type: 'Consultation',color: '#FFB347' },
+        { time: '03:00', ampm: 'PM', patient: 'Richard Brown',    type: 'New Patient', color: '#6FA8E6' },
+    ],
+};
+
+function dateKey(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
 }
 
-
-const handlePatientClick = async (patientName, data) => {
-
-    const patient = data.find(patient => patient.name === patientName); // Find selected patient
-    updatePageWithPatientData(patient)
-
+function formatDateLabel(date) {
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-displayData()
+function renderCalendar(date) {
+    document.getElementById('cal-month-label').textContent =
+        date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const calEl = document.getElementById('mini-calendar');
+    calEl.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'cal-grid';
+
+    ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'cal-day-header';
+        h.textContent = d;
+        grid.appendChild(h);
+    });
+
+    const firstDay   = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    const today       = new Date(2026, 9, 2);
+
+    for (let i = 0; i < firstDay; i++) {
+        const b = document.createElement('div');
+        b.className = 'cal-day other-month';
+        grid.appendChild(b);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        const thisDate = new Date(date.getFullYear(), date.getMonth(), d);
+        const key = dateKey(thisDate);
+        const el  = document.createElement('div');
+        el.className  = 'cal-day';
+        el.textContent = d;
+        if (thisDate.toDateString() === today.toDateString()) el.classList.add('today');
+        if (key === dateKey(calCurrentDate))  el.classList.add('selected');
+        if (baseAppointmentsData[key])        el.classList.add('has-appt');
+        el.addEventListener('click', () => {
+            calCurrentDate = thisDate;
+            renderCalendar(date);
+            renderAppointments(thisDate);
+        });
+        grid.appendChild(el);
+    }
+
+    calEl.appendChild(grid);
+}
+
+async function renderAppointments(date) {
+    const list  = document.getElementById('appt-list');
+    const label = document.getElementById('sched-selected-date');
+    label.textContent = formatDateLabel(date);
+    list.innerHTML = '';
+
+    const key = dateKey(date);
+    const base = baseAppointmentsData[key] || [];
+    const dbAppts = await TechCareDB.getAppointmentsByDate(key);
+
+    // Mark DB appointments with a delete button
+    const allAppts = [
+        ...base.map(a => ({ ...a, fromDB: false })),
+        ...dbAppts.map(a => ({ ...a, fromDB: true }))
+    ];
+
+    if (allAppts.length === 0) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'text-align:center;color:#aaa;padding:40px 0;font-size:13px;';
+        empty.textContent = 'No appointments scheduled for this day.';
+        list.appendChild(empty);
+        return;
+    }
+
+    // Sort by time
+    allAppts.sort((a, b) => a.time.localeCompare(b.time));
+
+    allAppts.forEach(appt => {
+        const item = document.createElement('div');
+        item.className = 'appt-item';
+        item.innerHTML = `
+            <div class="appt-time">
+                <p class="appt-time-main">${appt.time}</p>
+                <p class="appt-time-ampm">${appt.ampm}</p>
+            </div>
+            <div class="appt-color-bar" style="background:${appt.color || '#01F0D0'}"></div>
+            <div class="appt-details">
+                <p class="appt-patient">${appt.patient}</p>
+                <p class="appt-type">${appt.type}${appt.notes ? ' — ' + appt.notes : ''}</p>
+            </div>
+            ${appt.fromDB ? `<button class="appt-delete-btn" data-id="${appt.id}" title="Delete"><i data-lucide="trash-2"></i></button>` : ''}
+        `;
+        if (appt.fromDB) {
+            item.querySelector('.appt-delete-btn').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await TechCareDB.deleteAppointment(appt.id);
+                renderAppointments(date);
+                showToast('Appointment deleted.');
+            });
+        }
+        list.appendChild(item);
+    });
+    refreshIcons();
+}
+
+// New Appointment Modal
+const newApptModal  = document.getElementById('new-appt-modal');
+const newApptClose  = document.getElementById('new-appt-close');
+const saveApptBtn   = document.getElementById('save-appt-btn');
+
+function openNewApptModal() {
+    // Pre-fill date with currently viewed date
+    const dateInput = document.getElementById('appt-date');
+    dateInput.value = dateKey(calCurrentDate);
+    document.getElementById('appt-time').value    = '09:00';
+    document.getElementById('appt-patient').value = '';
+    document.getElementById('appt-notes').value   = '';
+    newApptModal.classList.remove('hidden');
+}
+
+newApptClose.addEventListener('click', () => newApptModal.classList.add('hidden'));
+newApptModal.addEventListener('click', (e) => { if (e.target === newApptModal) newApptModal.classList.add('hidden'); });
+
+saveApptBtn.addEventListener('click', async () => {
+    const patient  = document.getElementById('appt-patient').value.trim();
+    const dateStr  = document.getElementById('appt-date').value;
+    const timeStr  = document.getElementById('appt-time').value;
+    const type     = document.getElementById('appt-type').value;
+    const notes    = document.getElementById('appt-notes').value.trim();
+
+    if (!patient || !dateStr || !timeStr) { showToast('Please fill in patient, date, and time.'); return; }
+
+    // Parse time
+    const [hh, mm] = timeStr.split(':').map(Number);
+    const ampm = hh >= 12 ? 'PM' : 'AM';
+    const h12  = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
+    const timeDisplay = `${String(h12).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+
+    await TechCareDB.addAppointment({
+        dateKey: dateStr,
+        time:    timeDisplay,
+        ampm,
+        patient,
+        type,
+        color:   APPT_TYPE_COLORS[type] || '#01F0D0',
+        notes,
+    });
+
+    newApptModal.classList.add('hidden');
+
+    // Update calendar selected date and re-render
+    const [y, mo, d] = dateStr.split('-').map(Number);
+    calCurrentDate = new Date(y, mo - 1, d);
+    renderCalendar(calCurrentDate);
+    renderAppointments(calCurrentDate);
+    showToast(`Appointment booked for ${patient}!`);
+});
+
+function initSchedulePage() {
+    if (scheduleInitialized) { renderCalendar(calCurrentDate); renderAppointments(calCurrentDate); return; }
+    scheduleInitialized = true;
+
+    renderCalendar(calCurrentDate);
+    renderAppointments(calCurrentDate);
+
+    document.getElementById('cal-prev').addEventListener('click', () => {
+        calCurrentDate = new Date(calCurrentDate.getFullYear(), calCurrentDate.getMonth() - 1, 1);
+        renderCalendar(calCurrentDate);
+    });
+    document.getElementById('cal-next').addEventListener('click', () => {
+        calCurrentDate = new Date(calCurrentDate.getFullYear(), calCurrentDate.getMonth() + 1, 1);
+        renderCalendar(calCurrentDate);
+    });
+    document.getElementById('add-appt-btn').addEventListener('click', openNewApptModal);
+}
+
+// ============================================================
+// MESSAGE PAGE
+// ============================================================
+
+let msgInitialized = false;
+let allPatients    = [];
+let activeContact  = null;
+
+// Initial intro message ONLY for the first patient in the list
+const FIRST_PATIENT_INTRO = [
+    { from: 'patient', text: 'Hello Dr. Simmons, I have a question about my medication.' },
+    { from: 'doctor',  text: 'Of course! What would you like to know?' },
+    { from: 'patient', text: 'Is it okay to take my blood pressure pill with food?' },
+    { from: 'doctor',  text: 'Yes, you can take it with or without food. Just make sure you take it at the same time each day.' },
+];
+
+async function loadMessages(patientName) {
+    let msgs = await TechCareDB.getMessages(patientName);
+    const isFirstPatient = allPatients.length > 0 && allPatients[0].name === patientName;
+
+    // Only seed intro conversation for the very first patient
+    if (msgs.length === 0 && isFirstPatient) {
+        const now = new Date();
+        for (const m of FIRST_PATIENT_INTRO) {
+            await TechCareDB.addMessage({
+                patientName,
+                from: m.from,
+                text: m.text,
+                timestamp: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            });
+        }
+        msgs = await TechCareDB.getMessages(patientName);
+    }
+    return msgs;
+}
+
+function updateContactPreview(patientName, text) {
+    const safeId = 'msg-prev-' + patientName.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const el = document.getElementById(safeId);
+    if (el) el.textContent = text;
+}
+
+async function renderContacts(patients) {
+    const list = document.getElementById('msg-contact-list');
+    list.innerHTML = '';
+    for (let i = 0; i < patients.length; i++) {
+        const p = patients[i];
+        const msgs = await TechCareDB.getMessages(p.name);
+        let preview = 'No messages yet';
+        if (msgs.length > 0) {
+            const last = msgs[msgs.length - 1];
+            preview = (last.from === 'doctor' ? 'You: ' : '') + last.text;
+        } else if (i === 0) {
+            preview = 'Yes, you can take it with or without…';
+        }
+
+        const safeId = 'msg-prev-' + p.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const li = document.createElement('li');
+        li.className = 'list-item msg-list-item';
+        li.innerHTML = `
+            <div class="msg-list-row">
+                <img class="li-img" src="${p.profile_picture}" alt="${p.name}" style="border-radius:50%;object-fit:cover;">
+                <div class="msg-list-text">
+                    <p class="msg-list-name">${p.name}</p>
+                    <p class="msg-list-preview" id="${safeId}">${preview}</p>
+                </div>
+            </div>`;
+        li.addEventListener('click', async () => {
+            document.querySelectorAll('.msg-list-item').forEach(it => it.style.backgroundColor = 'transparent');
+            li.style.backgroundColor = 'var(--active2)';
+            await openConversation(p);
+        });
+        list.appendChild(li);
+    }
+}
+
+async function openConversation(patient) {
+    activeContact = patient;
+
+    document.getElementById('msg-chat-avatar').src         = patient.profile_picture;
+    document.getElementById('msg-chat-name').textContent   = patient.name;
+    document.getElementById('msg-chat-status').textContent = `${patient.gender}, ${patient.age} • ${patient.insurance_type || ''}`;
+
+    document.getElementById('msg-info-avatar').src        = patient.profile_picture;
+    document.getElementById('msg-info-name').textContent  = patient.name;
+    document.getElementById('msg-info-role').textContent  = `${patient.gender}, ${patient.age}`;
+    document.getElementById('msg-info-dob').textContent   = patient.date_of_birth || '—';
+    document.getElementById('msg-info-phone').textContent = patient.phone_number  || '—';
+    document.getElementById('msg-info-insurance').textContent = patient.insurance_type || '—';
+
+    const emptyState = document.getElementById('msg-empty-state');
+    if (emptyState) emptyState.style.display = 'none';
+
+    await renderChatMessages(patient.name);
+}
+
+async function renderChatMessages(patientName) {
+    const chatBody = document.getElementById('msg-chat-body');
+    chatBody.innerHTML = '';
+    const msgs = await loadMessages(patientName);
+
+    if (msgs.length === 0) {
+        chatBody.innerHTML = `
+            <div class="msg-empty-chat" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#888;text-align:center;padding:40px 20px;">
+                <div style="width:48px;height:48px;border-radius:50%;background:rgba(1,240,208,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--accent,#01F0D0);">
+                    <i data-lucide="message-square" style="width:22px;height:22px;"></i>
+                </div>
+                <p style="font-weight:600;color:#333;margin-bottom:4px;font-size:14px;">No messages yet</p>
+                <p style="font-size:12px;color:#777;max-width:280px;line-height:1.5;">Send a message below to start the conversation with ${patientName}.</p>
+            </div>`;
+        refreshIcons();
+        return;
+    }
+
+    msgs.forEach(msg => {
+        const bubble = document.createElement('div');
+        bubble.className = `msg-bubble ${msg.from === 'doctor' ? 'sent' : 'received'}`;
+        bubble.innerHTML = `${msg.text}<div class="msg-bubble-time">${msg.timestamp}</div>`;
+        chatBody.appendChild(bubble);
+    });
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function initMessagePage() {
+    if (msgInitialized) return;
+    msgInitialized = true;
+
+    fetchData().then(async data => {
+        if (!data) return;
+        allPatients = data;
+        await renderContacts(data);
+        // Auto-open first contact
+        if (data.length > 0) await openConversation(data[0]);
+        const items = document.querySelectorAll('.msg-list-item');
+        if (items[0]) items[0].style.backgroundColor = 'var(--active2)';
+    });
+
+    const sendBtn  = document.getElementById('msg-send-btn');
+    const msgInput = document.getElementById('msg-input');
+
+    const sendMessage = async () => {
+        const text = msgInput.value.trim();
+        if (!text || !activeContact) return;
+        const now = new Date();
+        const ts  = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        await TechCareDB.addMessage({ patientName: activeContact.name, from: 'doctor', text, timestamp: ts });
+        msgInput.value = '';
+        await renderChatMessages(activeContact.name);
+        updateContactPreview(activeContact.name, `You: ${text}`);
+
+        const currentContactName = activeContact.name;
+        // Simulated patient reply after 1.2s
+        setTimeout(async () => {
+            const replies = [
+                'Thank you, Doctor!', 'Got it, I\'ll follow your advice.',
+                'Should I come in for a check-up?', 'I appreciate your help!',
+                'I\'ll take note of that, thanks.', 'Could you clarify that a bit more?'
+            ];
+            const reply   = replies[Math.floor(Math.random() * replies.length)];
+            const replyTs = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            await TechCareDB.addMessage({ patientName: currentContactName, from: 'patient', text: reply, timestamp: replyTs });
+            if (activeContact && activeContact.name === currentContactName) {
+                await renderChatMessages(activeContact.name);
+            }
+            updateContactPreview(currentContactName, reply);
+        }, 1200);
+    };
+
+    sendBtn.addEventListener('click', sendMessage);
+    msgInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+    document.getElementById('msg-search').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        renderContacts(allPatients.filter(p => p.name.toLowerCase().includes(q)));
+    });
+}
+
+// ============================================================
+// TRANSACTION PAGE
+// ============================================================
+
+let txnInitialized = false;
+
+const txnData = [
+    { id: 'INV-001', patient: 'Nathan Evens',      service: 'General Consultation',    date: 'Oct 2, 2026',  amount: '$150.00', status: 'paid'     },
+    { id: 'INV-002', patient: 'Samantha Johnson',  service: 'Lab Test (CBC)',           date: 'Oct 2, 2026',  amount: '$85.00',  status: 'paid'     },
+    { id: 'INV-003', patient: 'Tyler Davis',        service: 'X-Ray Imaging',           date: 'Oct 1, 2026',  amount: '$320.00', status: 'pending'  },
+    { id: 'INV-004', patient: 'Ashley Martinez',   service: 'Specialist Referral',      date: 'Sep 30, 2026', amount: '$200.00', status: 'paid'     },
+    { id: 'INV-005', patient: 'Kevin Anderson',    service: 'Cardiac Consultation',     date: 'Sep 29, 2026', amount: '$450.00', status: 'pending'  },
+    { id: 'INV-006', patient: 'Olivia Brown',       service: 'Annual Check-up',         date: 'Sep 28, 2026', amount: '$175.00', status: 'paid'     },
+    { id: 'INV-007', patient: 'Dylan Thompson',    service: 'MRI Scan',                 date: 'Sep 27, 2026', amount: '$900.00', status: 'refunded' },
+    { id: 'INV-008', patient: 'Mike Nolan',         service: 'Blood Pressure Follow-up', date: 'Sep 26, 2026', amount: '$100.00', status: 'paid'    },
+    { id: 'INV-009', patient: 'John Martinez',     service: 'Diabetes Management',      date: 'Sep 25, 2026', amount: '$220.00', status: 'pending'  },
+    { id: 'INV-010', patient: 'Richard Brown',      service: 'General Consultation',    date: 'Sep 24, 2026', amount: '$150.00', status: 'paid'     },
+];
+
+function renderTransactions(filter = 'all') {
+    const tbody   = document.getElementById('txn-table-body');
+    tbody.innerHTML = '';
+    const filtered = filter === 'all' ? txnData : txnData.filter(t => t.status === filter);
+    filtered.forEach(txn => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${txn.id}</strong></td>
+            <td>${txn.patient}</td>
+            <td>${txn.service}</td>
+            <td>${txn.date}</td>
+            <td><strong>${txn.amount}</strong></td>
+            <td><span class="txn-status ${txn.status}">${txn.status.charAt(0).toUpperCase() + txn.status.slice(1)}</span></td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function initTransactionPage() {
+    if (txnInitialized) return;
+    txnInitialized = true;
+    renderTransactions();
+    document.getElementById('txn-status-filter').addEventListener('change', (e) => renderTransactions(e.target.value));
+}

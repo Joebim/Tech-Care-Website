@@ -16,40 +16,42 @@
     <meta property="og:image" content="https://www.yourwebsite.com/path/to/image.jpg">
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="icon" href="./assets/images/TestLogo.svg" type="image/x-icon"/>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
 
+    <!-- ===== NAVBAR ===== -->
     <div class="navbar">
         <div class="logo-contain">
-            <img class="nav-logo" src="./assets/images/TestLogo.svg" alt="">
+            <img class="nav-logo" src="./assets/images/TestLogo.svg" alt="Tech Care Logo">
         </div>
         <ul class="nav-links">
-            <li class="link">
+            <li class="link" data-page="overview">
                 <button>
                     <img src="./assets/images/group_FILL0_wght300_GRAD0_opsz24.svg" alt="">
                     <p>Overview</p>
                 </button>
             </li>
-            <li class="link">
+            <li class="link" data-page="patients">
                 <button>
                     <img src="./assets/images/home_FILL0_wght300_GRAD0_opsz24.svg" alt="">
                     <p>Patients</p>
                 </button>
             </li>
-            <li class="link">
+            <li class="link" data-page="schedule">
                 <button>
                     <img src="./assets/images/calendar_today_FILL0_wght300_GRAD0_opsz24.svg" alt="">
                     <p>Schedule</p>
                 </button>
             </li>
-            <li class="link">
+            <li class="link" data-page="message">
                 <button>
                     <img src="./assets/images/chat_bubble_FILL0_wght300_GRAD0_opsz24.svg" alt="">
                     <p>Message</p>
                 </button>
             </li>
-            <li class="link">
+            <li class="link" data-page="transaction">
                 <button>
                     <img src="./assets/images/credit_card_FILL0_wght300_GRAD0_opsz24.svg" alt="">
                     <p>Transaction</p>
@@ -58,9 +60,9 @@
         </ul>
 
         <div class="user-info-contain">
-            <div class="user-img">
+            <div class="user-img" id="user-nav-img-wrap">
                 <img src="./assets/images/senior-woman-doctor-and-portrait-smile-for-health-2023-11-27-05-18-16-utc.png"
-                    alt="">
+                    alt="Dr. Jose Simmons">
             </div>
             <div class="user-name">
                 <p class="primary-text">Dr. Jose Simmons</p>
@@ -70,21 +72,450 @@
             <div class="vl"></div>
 
             <div class="settings">
-                <div class="img-wrap">
-                    <img src="./assets/images/settings_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                <div class="img-wrap" id="settings-btn" title="Settings">
+                    <img src="./assets/images/settings_FILL0_wght300_GRAD0_opsz24.svg" alt="Settings">
                 </div>
-                <div class="img-wrap">
-                    <img src="./assets/images/more_vert_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                <button class="icon-btn nav-icon-btn" id="user-dropdown-btn" title="More options">
+                    <i data-lucide="ellipsis-vertical" style="width:16px;height:16px;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== USER DROPDOWN MENU ===== -->
+    <div id="user-dropdown" class="user-dropdown hidden">
+        <div class="dropdown-header">
+            <img src="./assets/images/senior-woman-doctor-and-portrait-smile-for-health-2023-11-27-05-18-16-utc.png" alt="Dr. Jose Simmons">
+            <div>
+                <p class="dropdown-name">Dr. Jose Simmons</p>
+                <p class="dropdown-role">General Practitioner</p>
+            </div>
+        </div>
+        <hr class="dropdown-divider">
+        <ul class="dropdown-menu-list">
+            <li class="dropdown-item" id="dd-profile">
+                <span class="dd-icon"><i data-lucide="user-round"></i></span>
+                <span>My Profile</span>
+            </li>
+            <li class="dropdown-item" id="dd-appointments">
+                <span class="dd-icon"><i data-lucide="calendar-days"></i></span>
+                <span>My Appointments</span>
+            </li>
+            <li class="dropdown-item" id="dd-settings-link">
+                <span class="dd-icon"><i data-lucide="settings"></i></span>
+                <span>Settings</span>
+            </li>
+            <li class="dropdown-item" id="dd-help">
+                <span class="dd-icon"><i data-lucide="circle-help"></i></span>
+                <span>Help &amp; Support</span>
+            </li>
+            <hr class="dropdown-divider">
+            <li class="dropdown-item danger" id="dd-logout">
+                <span class="dd-icon"><i data-lucide="log-out"></i></span>
+                <span>Sign Out</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ===== SETTINGS MODAL ===== -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" id="settings-close">&#10005;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-sidebar">
+                    <ul class="settings-nav">
+                        <li class="settings-nav-item active" data-tab="profile-settings">Profile</li>
+                        <li class="settings-nav-item" data-tab="notifications-settings">Notifications</li>
+                        <li class="settings-nav-item" data-tab="privacy-settings">Privacy &amp; Security</li>
+                        <li class="settings-nav-item" data-tab="display-settings">Display</li>
+                    </ul>
+                </div>
+                <div class="settings-content">
+                    <!-- Profile Settings -->
+                    <div class="settings-tab active" id="profile-settings">
+                        <h3>Profile Information</h3>
+                        <div class="settings-avatar-row">
+                            <img src="./assets/images/senior-woman-doctor-and-portrait-smile-for-health-2023-11-27-05-18-16-utc.png" alt="Profile" class="settings-avatar">
+                            <button class="btn-secondary">Change Photo</button>
+                        </div>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" value="Dr. Jose Simmons" id="settings-name">
+                            </div>
+                            <div class="form-group">
+                                <label>Specialty</label>
+                                <input type="text" value="General Practitioner" id="settings-specialty">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" value="j.simmons@techcare.io" id="settings-email">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" value="+1 (555) 234-5678" id="settings-phone">
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <select id="settings-dept">
+                                    <option>General Medicine</option>
+                                    <option>Cardiology</option>
+                                    <option>Neurology</option>
+                                    <option>Pediatrics</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary" id="save-profile-btn">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Settings -->
+                    <div class="settings-tab" id="notifications-settings">
+                        <h3>Notification Preferences</h3>
+                        <div class="settings-form">
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <p class="toggle-title">Appointment Reminders</p>
+                                    <p class="toggle-sub">Get notified 30 minutes before appointments</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <p class="toggle-title">New Patient Messages</p>
+                                    <p class="toggle-sub">Notify when a patient sends a message</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <p class="toggle-title">Lab Result Alerts</p>
+                                    <p class="toggle-sub">Receive alerts when lab results are ready</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <p class="toggle-title">System Updates</p>
+                                    <p class="toggle-sub">Be informed of new features and updates</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <p class="toggle-title">Email Notifications</p>
+                                    <p class="toggle-sub">Also send notifications to your email</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Settings -->
+                    <div class="settings-tab" id="privacy-settings">
+                        <h3>Privacy &amp; Security</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" placeholder="Enter current password">
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" placeholder="Re-enter new password">
+                            </div>
+                            <button class="btn-primary">Update Password</button>
+                            <div class="security-section">
+                                <h4>Two-Factor Authentication</h4>
+                                <div class="toggle-group">
+                                    <div class="toggle-info">
+                                        <p class="toggle-title">Enable 2FA</p>
+                                        <p class="toggle-sub">Add an extra layer of security to your account</p>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="security-section">
+                                <h4>Session Management</h4>
+                                <p class="toggle-sub">You are currently logged in on 1 device.</p>
+                                <button class="btn-danger">Sign Out All Devices</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Display Settings -->
+                    <div class="settings-tab" id="display-settings">
+                        <h3>Display Preferences</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label>Theme</label>
+                                <select id="theme-select">
+                                    <option value="light">Light Mode</option>
+                                    <option value="dark">Dark Mode</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Language</label>
+                                <select>
+                                    <option>English (US)</option>
+                                    <option>French</option>
+                                    <option>Spanish</option>
+                                    <option>German</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Date Format</label>
+                                <select>
+                                    <option>MM/DD/YYYY</option>
+                                    <option>DD/MM/YYYY</option>
+                                    <option>YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <p class="toggle-title">Compact Mode</p>
+                                    <p class="toggle-sub">Show more data with reduced spacing</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <button class="btn-primary">Apply Changes</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ===== PAGES CONTAINER ===== -->
     <div class="container">
-        <div class="overview page">
-            Overview
+
+        <!-- ===== OVERVIEW PAGE ===== -->
+        <div class="overview page" data-page="overview">
+            <div class="page-pad">
+            <div class="page-wrap overview-wrap">
+
+                <!-- Stats Row -->
+                <div class="overview-stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-teal"><i data-lucide="users"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Total Patients</p>
+                            <h2 class="stat-num">1,284</h2>
+                            <p class="stat-change positive">&#8593; 12% this month</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue"><i data-lucide="calendar-check"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Today's Appointments</p>
+                            <h2 class="stat-num">24</h2>
+                            <p class="stat-change positive">&#8593; 4 more than yesterday</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-pink"><i data-lucide="flask-conical"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Pending Lab Results</p>
+                            <h2 class="stat-num">38</h2>
+                            <p class="stat-change negative">5 awaiting review</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-green"><i data-lucide="message-circle"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Unread Messages</p>
+                            <h2 class="stat-num">7</h2>
+                            <p class="stat-change neutral">From 7 patients</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Middle Row -->
+                <div class="overview-middle-row">
+                    <div class="overview-card flex-2">
+                        <div class="header">
+                            <h1>Today's Schedule</h1>
+                            <span class="badge-today">Today</span>
+                        </div>
+                        <div class="todays-schedule">
+                            <div class="schedule-item schedule-active">
+                                <div class="schedule-time"><p class="time-text">09:00</p><p class="time-ampm">AM</p></div>
+                                <div class="schedule-line active-line"></div>
+                                <div class="schedule-details">
+                                    <p class="sched-patient">Emily Clarke</p>
+                                    <p class="sched-type">Annual Check-up</p>
+                                </div>
+                                <span class="sched-status ongoing">In Progress</span>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time"><p class="time-text">10:30</p><p class="time-ampm">AM</p></div>
+                                <div class="schedule-line"></div>
+                                <div class="schedule-details">
+                                    <p class="sched-patient">Nathan Evens</p>
+                                    <p class="sched-type">Blood Pressure Follow-up</p>
+                                </div>
+                                <span class="sched-status upcoming">Upcoming</span>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time"><p class="time-text">12:00</p><p class="time-ampm">PM</p></div>
+                                <div class="schedule-line"></div>
+                                <div class="schedule-details">
+                                    <p class="sched-patient">Samantha Johnson</p>
+                                    <p class="sched-type">Lab Results Review</p>
+                                </div>
+                                <span class="sched-status upcoming">Upcoming</span>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time"><p class="time-text">02:00</p><p class="time-ampm">PM</p></div>
+                                <div class="schedule-line"></div>
+                                <div class="schedule-details">
+                                    <p class="sched-patient">Kevin Anderson</p>
+                                    <p class="sched-type">Cardiac Consultation</p>
+                                </div>
+                                <span class="sched-status upcoming">Upcoming</span>
+                            </div>
+                            <div class="schedule-item">
+                                <div class="schedule-time"><p class="time-text">03:30</p><p class="time-ampm">PM</p></div>
+                                <div class="schedule-line"></div>
+                                <div class="schedule-details">
+                                    <p class="sched-patient">Olivia Brown</p>
+                                    <p class="sched-type">New Patient Intake</p>
+                                </div>
+                                <span class="sched-status upcoming">Upcoming</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-card flex-1">
+                        <div class="header"><h1>Recent Activity</h1></div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-dot dot-teal"></div>
+                                <div class="activity-text">
+                                    <p class="activity-main">Lab result for <strong>Tyler Davis</strong> is ready</p>
+                                    <p class="activity-time">2 min ago</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot dot-pink"></div>
+                                <div class="activity-text">
+                                    <p class="activity-main"><strong>Dylan Thompson</strong> sent a message</p>
+                                    <p class="activity-time">15 min ago</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot dot-blue"></div>
+                                <div class="activity-text">
+                                    <p class="activity-main">Appointment confirmed: <strong>Mike Nolan</strong></p>
+                                    <p class="activity-time">1 hr ago</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot dot-teal"></div>
+                                <div class="activity-text">
+                                    <p class="activity-main">New patient: <strong>John Martinez</strong></p>
+                                    <p class="activity-time">3 hrs ago</p>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-dot dot-pink"></div>
+                                <div class="activity-text">
+                                    <p class="activity-main">Prescription updated: <strong>Ashley Martinez</strong></p>
+                                    <p class="activity-time">5 hrs ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row -->
+                <div class="overview-bottom-row">
+                    <div class="overview-card flex-1">
+                        <div class="header"><h1>Patient Demographics</h1></div>
+                        <div class="demographics-list">
+                            <div class="demo-row">
+                                <p>Male</p>
+                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-blue" style="width:52%"></div></div>
+                                <p>52%</p>
+                            </div>
+                            <div class="demo-row">
+                                <p>Female</p>
+                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-pink" style="width:44%"></div></div>
+                                <p>44%</p>
+                            </div>
+                            <div class="demo-row">
+                                <p>Other</p>
+                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" style="width:4%"></div></div>
+                                <p>4%</p>
+                            </div>
+                        </div>
+                        <div class="age-groups">
+                            <h4>Age Groups</h4>
+                            <div class="age-row"><span class="age-label">0-17</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" style="width:15%"></div></div><span>15%</span></div>
+                            <div class="age-row"><span class="age-label">18-40</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-blue" style="width:38%"></div></div><span>38%</span></div>
+                            <div class="age-row"><span class="age-label">41-65</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-pink" style="width:32%"></div></div><span>32%</span></div>
+                            <div class="age-row"><span class="age-label">65+</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" style="width:15%"></div></div><span>15%</span></div>
+                        </div>
+                    </div>
+                    <div class="overview-card flex-1">
+                        <div class="header"><h1>Common Diagnoses</h1></div>
+                        <div class="diagnoses-list">
+                            <div class="diagnoses-item">
+                                <div class="diagnoses-left"><div class="diag-dot" style="background:#E66FD2"></div><p>Hypertension</p></div>
+                                <p class="diag-count">312 patients</p>
+                            </div>
+                            <div class="diagnoses-item">
+                                <div class="diagnoses-left"><div class="diag-dot" style="background:#8C6FE6"></div><p>Type 2 Diabetes</p></div>
+                                <p class="diag-count">218 patients</p>
+                            </div>
+                            <div class="diagnoses-item">
+                                <div class="diagnoses-left"><div class="diag-dot" style="background:#01F0D0"></div><p>Asthma</p></div>
+                                <p class="diag-count">174 patients</p>
+                            </div>
+                            <div class="diagnoses-item">
+                                <div class="diagnoses-left"><div class="diag-dot" style="background:#FFB347"></div><p>Anxiety Disorder</p></div>
+                                <p class="diag-count">156 patients</p>
+                            </div>
+                            <div class="diagnoses-item">
+                                <div class="diagnoses-left"><div class="diag-dot" style="background:#6FA8E6"></div><p>Hyperlipidemia</p></div>
+                                <p class="diag-count">129 patients</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            </div><!-- end .page-pad -->
         </div>
-        <div id="patients" class="patients page">
+
+        <!-- ===== PATIENTS PAGE ===== -->
+        <div id="patients" class="patients page" data-page="patients">
             <div class="page-wrap">
                 <div class="side-list">
                     <div class="header">
@@ -93,11 +524,8 @@
                     </div>
                     <div class="side-list-body">
                         <div class="side-list-body-wrap">
-                            <ul class="list" id="patient-list">
-                                <!-- List data -->
-                            </ul>
+                            <ul class="list" id="patient-list"></ul>
                         </div>
-
                     </div>
                 </div>
                 <div class="patient-info">
@@ -113,16 +541,14 @@
                                             <h1>Blood Pressure</h1>
                                             <div class="chart-time">
                                                 <p>Last 6 months</p>
-                                                <img src="./assets/images/expand_more_FILL0_wght300_GRAD0_opsz24.svg"
-                                                    alt="">
+                                                <img src="./assets/images/expand_more_FILL0_wght300_GRAD0_opsz24.svg" alt="">
                                             </div>
                                         </div>
                                         <div id="chart-wrap" class="">
                                             <div id="chart"></div>
                                         </div>
                                     </div>
-                                    <div id="diagnostics-history-chart-details"
-                                        class="diagnostics-history-chart-details">
+                                    <div id="diagnostics-history-chart-details" class="diagnostics-history-chart-details">
                                         <div class="readings">
                                             <div class="readings-wrap">
                                                 <div class="indicator-systolic"></div>
@@ -147,7 +573,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                                 <div class="details-wrap">
                                     <div class="details one">
@@ -158,20 +583,18 @@
                                         </div>
                                         <p id="resp-average">Normal</p>
                                     </div>
-
                                     <div class="details two">
                                         <img src="./assets/images/temperature.svg" alt="">
                                         <div class="details-text">
-                                            <p id="temp-name">Respiratory Rate</p>
+                                            <p id="temp-name">Temperature</p>
                                             <h1 id="temp-value">98.6°F</h1>
                                         </div>
                                         <p id="temp-average">Normal</p>
                                     </div>
-
                                     <div class="details three">
                                         <img src="./assets/images/HeartBPM.svg" alt="">
                                         <div class="details-text">
-                                            <p id="heart-name">Respiratory Rate</p>
+                                            <p id="heart-name">Heart Rate</p>
                                             <h1 id="heart-value">78 bpm</h1>
                                         </div>
                                         <div class="details-dropdown-toggle">
@@ -195,11 +618,7 @@
                                             <th>Status</th>
                                         </tr>
                                     </thead>
-
-                                    <tbody id="diagnosic-list">
-
-                                    </tbody>
-
+                                    <tbody id="diagnosic-list"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -218,7 +637,6 @@
                                         <p id="dob"></p>
                                     </div>
                                 </div>
-
                                 <div class="profile-body-info">
                                     <img src="./assets/images/FemaleIcon.svg" alt="">
                                     <div class="profile-body-text">
@@ -226,7 +644,6 @@
                                         <p id="gender"></p>
                                     </div>
                                 </div>
-
                                 <div class="profile-body-info">
                                     <img src="./assets/images/PhoneIcon.svg" alt="">
                                     <div class="profile-body-text">
@@ -234,7 +651,6 @@
                                         <p id="contact-info"></p>
                                     </div>
                                 </div>
-
                                 <div class="profile-body-info">
                                     <img src="./assets/images/PhoneIcon.svg" alt="">
                                     <div class="profile-body-text">
@@ -242,7 +658,6 @@
                                         <p id="emergency-contacts"></p>
                                     </div>
                                 </div>
-
                                 <div class="profile-body-info">
                                     <img src="./assets/images/InsuranceIcon.svg" alt="">
                                     <div class="profile-body-text">
@@ -250,7 +665,6 @@
                                         <p id="insurance-provider"></p>
                                     </div>
                                 </div>
-
                             </div>
                             <button>Show All Information</button>
                         </div>
@@ -258,26 +672,502 @@
                             <div class="header">
                                 <h1>Lab results</h1>
                             </div>
-                            <div id="results" class="results">
-
-                            </div>
+                            <div id="results" class="results"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="schedule page ">
-            Schedule
+
+        <!-- ===== SCHEDULE PAGE ===== -->
+        <div class="schedule page" data-page="schedule">
+            <div class="page-pad">
+            <div class="page-wrap schedule-wrap">
+                <div class="schedule-left">
+                    <div class="overview-card">
+                        <div class="header">
+                            <h1 id="cal-month-label">October 2026</h1>
+                            <div class="cal-nav">
+                                <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
+                                <button class="cal-nav-btn" id="cal-next">&#8250;</button>
+                            </div>
+                        </div>
+                        <div class="mini-calendar" id="mini-calendar"></div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="header"><h1>Appointment Types</h1></div>
+                        <div class="legend-list">
+                            <div class="legend-item"><div class="legend-dot" style="background:#01F0D0"></div><p>Check-up</p></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#8C6FE6"></div><p>Follow-up</p></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#E66FD2"></div><p>Lab Review</p></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#FFB347"></div><p>Consultation</p></div>
+                            <div class="legend-item"><div class="legend-dot" style="background:#6FA8E6"></div><p>New Patient</p></div>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="header"><h1>This Week</h1></div>
+                        <div class="week-summary">
+                            <div class="week-stat"><p class="week-num">12</p><p class="week-label">Appointments</p></div>
+                            <div class="week-stat"><p class="week-num">3</p><p class="week-label">New Patients</p></div>
+                            <div class="week-stat"><p class="week-num">2</p><p class="week-label">Cancellations</p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="schedule-right overview-card">
+                    <div class="header">
+                        <h1>Appointments &mdash; <span id="sched-selected-date">October 2, 2026</span></h1>
+                        <button class="btn-primary btn-sm" id="add-appt-btn">+ New</button>
+                    </div>
+                    <div class="appt-list" id="appt-list"></div>
+                </div>
+            </div>
+            </div><!-- end .page-pad -->
         </div>
-        <div class="message page ">
-            Message
+
+        <!-- ===== MESSAGE PAGE ===== -->
+        <div class="message page" data-page="message">
+            <div class="page-pad">
+            <div class="page-wrap message-wrap">
+                <div class="msg-sidebar side-list">
+                    <div class="header">
+                        <h1>Messages</h1>
+                        <img src="./assets/images/search_FILL0_wght300_GRAD0_opsz24.svg" alt="">
+                    </div>
+                    <div class="msg-search-bar">
+                        <input type="text" placeholder="Search patients..." id="msg-search" class="msg-search-input">
+                    </div>
+                    <div class="side-list-body">
+                        <div class="side-list-body-wrap">
+                            <ul class="list msg-list" id="msg-contact-list"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="msg-chat-window overview-card">
+                    <div class="msg-chat-header" id="msg-chat-header">
+                        <div class="msg-chat-user">
+                            <img id="msg-chat-avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                            <div>
+                                <p class="primary-text" id="msg-chat-name">Select a conversation</p>
+                                <p class="secondary-text" id="msg-chat-status">&mdash;</p>
+                            </div>
+                        </div>
+                        <div class="msg-chat-actions">
+                            <button class="icon-btn" title="Video call"><i data-lucide="video"></i></button>
+                            <button class="icon-btn" title="Phone call"><i data-lucide="phone"></i></button>
+                            <button class="icon-btn" title="More options"><i data-lucide="ellipsis"></i></button>
+                        </div>
+                    </div>
+                    <div class="msg-chat-body" id="msg-chat-body">
+                        <div class="msg-empty-state" id="msg-empty-state">
+                            <i data-lucide="message-circle-more" style="width:40px;height:40px;color:#ccc;"></i>
+                            <p>Select a patient to view the conversation</p>
+                        </div>
+                    </div>
+                    <div class="msg-input-area" id="msg-input-area">
+                        <button class="icon-btn" title="Attach file"><i data-lucide="paperclip"></i></button>
+                        <input type="text" id="msg-input" class="msg-text-input" placeholder="Type a message...">
+                        <button class="btn-primary btn-sm" id="msg-send-btn">Send</button>
+                    </div>
+                </div>
+                <div class="msg-info-panel patient-details" id="msg-info-panel">
+                    <div class="overview-card">
+                        <div class="profile-head" style="margin-top:10px">
+                            <img id="msg-info-avatar" src="" alt="" style="width:80px;border-radius:50%;object-fit:cover;">
+                            <h1 id="msg-info-name" style="font-size:15px;text-align:center"></h1>
+                            <p id="msg-info-role" class="secondary-text" style="font-size:12px;text-align:center"></p>
+                        </div>
+                        <div class="profile-body" style="margin-top:16px;padding:0 10px 10px">
+                            <div class="profile-body-info">
+                                <img src="./assets/images/BirthIcon.svg" alt="">
+                                <div class="profile-body-text">
+                                    <p>Date of Birth</p>
+                                    <p id="msg-info-dob" class="primary-text"></p>
+                                </div>
+                            </div>
+                            <div class="profile-body-info">
+                                <img src="./assets/images/PhoneIcon.svg" alt="">
+                                <div class="profile-body-text">
+                                    <p>Phone</p>
+                                    <p id="msg-info-phone" class="primary-text"></p>
+                                </div>
+                            </div>
+                            <div class="profile-body-info">
+                                <img src="./assets/images/InsuranceIcon.svg" alt="">
+                                <div class="profile-body-text">
+                                    <p>Insurance</p>
+                                    <p id="msg-info-insurance" class="primary-text"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="header"><h1>Shared Files</h1></div>
+                        <div class="shared-files">
+                            <div class="shared-file-item"><i data-lucide="file-text"></i><p>Lab_Report_Oct2026.pdf</p></div>
+                            <div class="shared-file-item"><i data-lucide="image"></i><p>X-Ray_Chest_Sep2026.png</p></div>
+                            <div class="shared-file-item"><i data-lucide="file-text"></i><p>Prescription_Aug2026.pdf</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div><!-- end .page-pad -->
         </div>
-        <div class="transaction page ">
-            Transaction
+
+        <!-- ===== TRANSACTION PAGE ===== -->
+        <div class="transaction page" data-page="transaction">
+            <div class="page-pad">
+            <div class="page-wrap transaction-wrap">
+                <div class="transaction-summary">
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-teal"><i data-lucide="circle-dollar-sign"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Total Revenue</p>
+                            <h2 class="stat-num">$84,320</h2>
+                            <p class="stat-change positive">&#8593; 8.4% vs last month</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-blue"><i data-lucide="file-clock"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Pending Invoices</p>
+                            <h2 class="stat-num">$12,450</h2>
+                            <p class="stat-change negative">14 outstanding</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-pink"><i data-lucide="badge-check"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Paid This Month</p>
+                            <h2 class="stat-num">$71,870</h2>
+                            <p class="stat-change positive">&#8593; 132 transactions</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon stat-icon-green"><i data-lucide="receipt"></i></div>
+                        <div class="stat-text">
+                            <p class="stat-label">Refunds Issued</p>
+                            <h2 class="stat-num">$1,240</h2>
+                            <p class="stat-change neutral">3 refunds</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="transaction-main">
+                    <div class="overview-card transaction-table-card">
+                        <div class="header">
+                            <h1>Recent Transactions</h1>
+                            <div class="txn-filters">
+                                <select class="filter-select" id="txn-status-filter">
+                                    <option value="all">All Status</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="refunded">Refunded</option>
+                                </select>
+                                <button class="btn-primary btn-sm">Export</button>
+                            </div>
+                        </div>
+                        <div class="txn-table-wrap">
+                            <table class="txn-table">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Patient</th>
+                                        <th>Service</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="txn-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="transaction-sidebar">
+                        <div class="overview-card">
+                            <div class="header"><h1>Payment Methods</h1></div>
+                            <div class="payment-methods">
+                                <div class="payment-method-item">
+                                    <div class="pm-icon pm-card"><i data-lucide="credit-card"></i></div>
+                                    <div>
+                                        <p class="primary-text">Credit / Debit Card</p>
+                                        <p class="secondary-text">68% of payments</p>
+                                    </div>
+                                </div>
+                                <div class="payment-method-item">
+                                    <div class="pm-icon pm-insurance"><i data-lucide="shield-plus"></i></div>
+                                    <div>
+                                        <p class="primary-text">Insurance</p>
+                                        <p class="secondary-text">22% of payments</p>
+                                    </div>
+                                </div>
+                                <div class="payment-method-item">
+                                    <div class="pm-icon pm-cash"><i data-lucide="banknote"></i></div>
+                                    <div>
+                                        <p class="primary-text">Cash</p>
+                                        <p class="secondary-text">10% of payments</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="header"><h1>Top Services</h1></div>
+                            <div class="diagnoses-list">
+                                <div class="diagnoses-item">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#01F0D0"></div><p>General Consultation</p></div>
+                                    <p class="diag-count">$18,400</p>
+                                </div>
+                                <div class="diagnoses-item">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#E66FD2"></div><p>Lab Tests</p></div>
+                                    <p class="diag-count">$14,920</p>
+                                </div>
+                                <div class="diagnoses-item">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#8C6FE6"></div><p>Imaging (X-Ray/MRI)</p></div>
+                                    <p class="diag-count">$12,500</p>
+                                </div>
+                                <div class="diagnoses-item">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#FFB347"></div><p>Specialist Referral</p></div>
+                                    <p class="diag-count">$9,800</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div><!-- end .page-pad -->
+        </div>
+
+    </div><!-- end .container -->
+
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="login-screen" class="login-screen hidden">
+        <div class="login-bg-blob blob-1"></div>
+        <div class="login-bg-blob blob-2"></div>
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="./assets/images/TestLogo.svg" alt="Tech Care Logo">
+            </div>
+            <div class="login-text">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your TechCare doctor portal</p>
+            </div>
+            <div id="login-error" class="login-error hidden"></div>
+            <div class="form-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" placeholder="your@email.com" value="j.simmons@techcare.io" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <div class="pw-field-wrap">
+                    <input type="password" id="login-password" placeholder="••••••••" value="TechCare2026!" autocomplete="current-password">
+                    <button class="pw-eye" id="pw-toggle" type="button"><i data-lucide="eye"></i></button>
+                </div>
+            </div>
+            <button class="btn-primary login-submit-btn" id="login-btn">Sign In</button>
+            <p class="login-demo-hint">
+                <i data-lucide="info" style="width:12px;height:12px;vertical-align:middle;"></i>
+                Demo: j.simmons@techcare.io / TechCare2026!
+            </p>
         </div>
     </div>
+
+    <!-- ===== PROFILE OVERLAY ===== -->
+    <div id="profile-overlay" class="overlay-page hidden">
+        <div class="overlay-header">
+            <button class="back-btn" id="profile-back"><i data-lucide="arrow-left"></i> Back</button>
+            <h2>My Profile</h2>
+            <div></div>
+        </div>
+        <div class="overlay-body">
+            <!-- Hero -->
+            <div class="profile-hero">
+                <div class="profile-hero-inner">
+                    <div class="profile-avatar-wrap">
+                        <img id="profile-avatar" src="./assets/images/senior-woman-doctor-and-portrait-smile-for-health-2023-11-27-05-18-16-utc.png" alt="Profile Photo">
+                    </div>
+                    <div class="profile-hero-info">
+                        <h1 id="profile-hero-name">Dr. Jose Simmons</h1>
+                        <p id="profile-hero-specialty" class="secondary-text">General Practitioner</p>
+                        <p id="profile-hero-email" class="secondary-text"></p>
+                    </div>
+                </div>
+                <div class="profile-stats-row">
+                    <div class="profile-stat"><h3>1,284</h3><p>Total Patients</p></div>
+                    <div class="profile-stat"><h3>12+</h3><p>Years Experience</p></div>
+                    <div class="profile-stat"><h3>4.9</h3><p>Rating</p></div>
+                    <div class="profile-stat"><h3>24</h3><p>Today's Appts</p></div>
+                </div>
+            </div>
+            <!-- Tabs Nav -->
+            <div class="profile-tabs-nav">
+                <button class="profile-tab-btn active" data-ptab="personal"><i data-lucide="user"></i> Personal Info</button>
+                <button class="profile-tab-btn" data-ptab="activity"><i data-lucide="activity"></i> Activity</button>
+                <button class="profile-tab-btn" data-ptab="security"><i data-lucide="shield"></i> Security</button>
+            </div>
+            <!-- Personal Info Tab -->
+            <div id="ptab-personal" class="profile-tab-content active">
+                <div class="profile-form-card">
+                    <h3>Personal Information</h3>
+                    <div class="settings-form">
+                        <div class="form-row-2">
+                            <div class="form-group"><label>Full Name</label><input type="text" id="p-name"></div>
+                            <div class="form-group"><label>Specialty</label><input type="text" id="p-specialty"></div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group"><label>Email Address</label><input type="email" id="p-email"></div>
+                            <div class="form-group"><label>Phone Number</label><input type="tel" id="p-phone"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <select id="p-dept">
+                                <option>General Medicine</option>
+                                <option>Cardiology</option>
+                                <option>Neurology</option>
+                                <option>Pediatrics</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Bio / About</label><textarea id="p-bio" rows="3" placeholder="Write a short bio..."></textarea></div>
+                        <div class="form-group"><label>Office Address</label><input type="text" id="p-address"></div>
+                        <button class="btn-primary" id="save-profile-full-btn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Activity Tab -->
+            <div id="ptab-activity" class="profile-tab-content">
+                <div class="profile-form-card">
+                    <h3>Recent Appointment Activity</h3>
+                    <div class="activity-list" id="profile-activity-list"></div>
+                </div>
+            </div>
+            <!-- Security Tab -->
+            <div id="ptab-security" class="profile-tab-content">
+                <div class="profile-form-card">
+                    <h3>Change Password</h3>
+                    <div class="settings-form">
+                        <div class="form-group"><label>Current Password</label><input type="password" id="sec-current-pw" placeholder="Enter current password"></div>
+                        <div class="form-group"><label>New Password</label><input type="password" id="sec-new-pw" placeholder="Min. 8 characters"></div>
+                        <div class="form-group"><label>Confirm New Password</label><input type="password" id="sec-confirm-pw" placeholder="Re-enter new password"></div>
+                        <button class="btn-primary" id="change-pw-btn">Update Password</button>
+                    </div>
+                </div>
+                <div class="profile-form-card" style="margin-top:16px;">
+                    <h3>Session Management</h3>
+                    <p class="toggle-sub">Signed in as: <strong id="sec-session-email"></strong></p>
+                    <p class="toggle-sub" style="margin-top:4px;">Login time: <strong id="sec-session-time"></strong></p>
+                    <button class="btn-danger" id="sec-logout-all" style="margin-top:16px;">Sign Out of All Devices</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HELP & SUPPORT OVERLAY ===== -->
+    <div id="help-overlay" class="overlay-page hidden">
+        <div class="overlay-header">
+            <button class="back-btn" id="help-back"><i data-lucide="arrow-left"></i> Back</button>
+            <h2>Help &amp; Support</h2>
+            <div></div>
+        </div>
+        <div class="overlay-body">
+            <!-- Hero Search -->
+            <div class="help-hero">
+                <h1>How can we help you?</h1>
+                <p>Search our knowledge base or browse topics below</p>
+                <div class="help-search-wrap">
+                    <i data-lucide="search" style="color:#aaa;"></i>
+                    <input type="text" id="help-search-input" placeholder="Search for answers…">
+                </div>
+            </div>
+            <!-- Quick Links -->
+            <div class="help-quick-links">
+                <div class="help-quick-card">
+                    <div class="help-qc-icon"><i data-lucide="calendar"></i></div>
+                    <h4>Appointments</h4>
+                    <p>Manage your schedule and bookings</p>
+                </div>
+                <div class="help-quick-card">
+                    <div class="help-qc-icon"><i data-lucide="message-circle"></i></div>
+                    <h4>Messaging</h4>
+                    <p>Patient communication and chat</p>
+                </div>
+                <div class="help-quick-card">
+                    <div class="help-qc-icon"><i data-lucide="credit-card"></i></div>
+                    <h4>Billing</h4>
+                    <p>Invoices, payments and transactions</p>
+                </div>
+                <div class="help-quick-card">
+                    <div class="help-qc-icon"><i data-lucide="shield"></i></div>
+                    <h4>Privacy</h4>
+                    <p>Data security and HIPAA compliance</p>
+                </div>
+            </div>
+            <!-- FAQ -->
+            <div class="help-section">
+                <h2>Frequently Asked Questions</h2>
+                <div class="faq-list" id="faq-list"></div>
+            </div>
+            <!-- Contact Form -->
+            <div class="help-section">
+                <h2>Still Need Help?</h2>
+                <div class="profile-form-card">
+                    <div class="settings-form">
+                        <div class="form-row-2">
+                            <div class="form-group"><label>Subject</label><input type="text" id="help-subject" placeholder="What is your issue about?"></div>
+                            <div class="form-group">
+                                <label>Priority</label>
+                                <select id="help-priority">
+                                    <option>Low</option><option>Medium</option><option selected>High</option><option>Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Message</label><textarea id="help-message" rows="4" placeholder="Describe your issue in detail…"></textarea></div>
+                        <button class="btn-primary" id="help-submit-btn">Send Support Request</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NEW APPOINTMENT MODAL ===== -->
+    <div id="new-appt-modal" class="modal-overlay hidden">
+        <div class="modal-box" style="max-width:520px;">
+            <div class="modal-header">
+                <h2>New Appointment</h2>
+                <button class="modal-close" id="new-appt-close">&#10005;</button>
+            </div>
+            <div class="modal-body" style="padding:24px;">
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label>Patient Name</label>
+                        <input type="text" id="appt-patient" placeholder="Patient full name" list="appt-patient-list" autocomplete="off">
+                        <datalist id="appt-patient-list"></datalist>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group"><label>Date</label><input type="date" id="appt-date"></div>
+                        <div class="form-group"><label>Time</label><input type="time" id="appt-time" value="09:00"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Appointment Type</label>
+                        <select id="appt-type">
+                            <option value="Check-up">Annual Check-up</option>
+                            <option value="Follow-up">Follow-up</option>
+                            <option value="Lab Review">Lab Results Review</option>
+                            <option value="Consultation">Consultation</option>
+                            <option value="New Patient">New Patient Intake</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Notes (optional)</label><textarea id="appt-notes" rows="2" placeholder="Any relevant notes…"></textarea></div>
+                    <button class="btn-primary" id="save-appt-btn">Book Appointment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="./assets/js/db.js"></script>
+    <script src="./assets/js/auth.js"></script>
     <script src="./assets/js/index.js"></script>
+    <script>lucide.createIcons();</script>
 </body>
 
 </html>
