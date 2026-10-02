@@ -320,56 +320,85 @@
             <div class="page-pad">
             <div class="page-wrap overview-wrap">
 
-                <!-- Stats Row -->
+                <!-- Dark Hero Welcome Banner (Stays Dark) -->
+                <div class="overview-hero">
+                    <div class="overview-hero-content">
+                        <div class="overview-hero-badge">
+                            <span class="pulse-indicator"></span>
+                            <span>Live Clinic Operations</span>
+                        </div>
+                        <h1 class="overview-hero-title">Practice Overview &amp; Analytics</h1>
+                        <p class="overview-hero-sub">Welcome back, <strong class="hero-name-highlight" id="hero-doctor-name">Dr. Jose Simmons</strong>. You have <strong id="hero-appt-count">24 patient visits</strong> today with <strong id="hero-lab-count">5 lab reviews</strong> awaiting sign-off.</p>
+                    </div>
+                    <div class="overview-hero-actions">
+                        <button class="hero-action-btn hero-action-primary" id="overview-new-appt-btn">
+                            <i data-lucide="plus-circle"></i>
+                            <span>New Appointment</span>
+                        </button>
+                        <button class="hero-action-btn hero-action-ghost" id="overview-view-patients-btn">
+                            <i data-lucide="users"></i>
+                            <span>Patients</span>
+                        </button>
+                        <button class="hero-action-btn hero-action-ghost" id="overview-check-messages-btn">
+                            <i data-lucide="message-square"></i>
+                            <span>Messages <span class="hero-action-counter" id="hero-msg-count">7</span></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Row (Reverted to clean light card design) -->
                 <div class="overview-stats-row">
-                    <div class="stat-card">
+                    <div class="stat-card" id="stat-patients-card" title="Click to view Patients" style="cursor:pointer;">
                         <div class="stat-icon stat-icon-teal"><i data-lucide="users"></i></div>
                         <div class="stat-text">
                             <p class="stat-label">Total Patients</p>
-                            <h2 class="stat-num">1,284</h2>
+                            <h2 class="stat-num" id="stat-patient-num">1,284</h2>
                             <p class="stat-change positive">&#8593; 12% this month</p>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="stat-schedule-card" title="Click to view Schedule" style="cursor:pointer;">
                         <div class="stat-icon stat-icon-blue"><i data-lucide="calendar-check"></i></div>
                         <div class="stat-text">
                             <p class="stat-label">Today's Appointments</p>
-                            <h2 class="stat-num">24</h2>
-                            <p class="stat-change positive">&#8593; 4 more than yesterday</p>
+                            <h2 class="stat-num" id="stat-appt-num">24</h2>
+                            <p class="stat-change positive" id="stat-appt-change">&#8593; 4 more than yesterday</p>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="stat-labs-card">
                         <div class="stat-icon stat-icon-pink"><i data-lucide="flask-conical"></i></div>
                         <div class="stat-text">
                             <p class="stat-label">Pending Lab Results</p>
-                            <h2 class="stat-num">38</h2>
-                            <p class="stat-change negative">5 awaiting review</p>
+                            <h2 class="stat-num" id="stat-lab-num">38</h2>
+                            <p class="stat-change negative" id="stat-lab-change">5 awaiting review</p>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="stat-messages-card" title="Click to view Messages" style="cursor:pointer;">
                         <div class="stat-icon stat-icon-green"><i data-lucide="message-circle"></i></div>
                         <div class="stat-text">
                             <p class="stat-label">Unread Messages</p>
-                            <h2 class="stat-num">7</h2>
-                            <p class="stat-change neutral">From 7 patients</p>
+                            <h2 class="stat-num" id="stat-msg-num">7</h2>
+                            <p class="stat-change neutral" id="stat-msg-change">From 7 patients</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Middle Row -->
+                <!-- Middle Row (Reverted to clean light card design) -->
                 <div class="overview-middle-row">
                     <div class="overview-card flex-2">
                         <div class="header">
-                            <h1>Today's Schedule</h1>
-                            <span class="badge-today">Today</span>
+                            <div class="header-title-group">
+                                <h1>Today's Schedule</h1>
+                                <span class="badge-today"><span class="pulse-indicator-small"></span> Today &bull; Oct 2</span>
+                            </div>
+                            <button class="card-action-link" id="overview-see-all-sched">See Full Schedule &rarr;</button>
                         </div>
-                        <div class="todays-schedule">
+                        <div class="todays-schedule" id="overview-schedule-list">
                             <div class="schedule-item schedule-active">
                                 <div class="schedule-time"><p class="time-text">09:00</p><p class="time-ampm">AM</p></div>
                                 <div class="schedule-line active-line"></div>
                                 <div class="schedule-details">
                                     <p class="sched-patient">Emily Clarke</p>
-                                    <p class="sched-type">Annual Check-up</p>
+                                    <p class="sched-type">Annual Check-up &bull; Exam Room 2B</p>
                                 </div>
                                 <span class="sched-status ongoing">In Progress</span>
                             </div>
@@ -413,98 +442,123 @@
                     </div>
 
                     <div class="overview-card flex-1">
-                        <div class="header"><h1>Recent Activity</h1></div>
-                        <div class="activity-list">
+                        <div class="header">
+                            <h1>Recent Activity</h1>
+                            <span class="card-chip">Live Feed</span>
+                        </div>
+                        <div class="activity-list" id="overview-activity-list">
                             <div class="activity-item">
                                 <div class="activity-dot dot-teal"></div>
                                 <div class="activity-text">
-                                    <p class="activity-main">Lab result for <strong>Tyler Davis</strong> is ready</p>
-                                    <p class="activity-time">2 min ago</p>
+                                    <p class="activity-main">Lab result for <strong class="patient-name-highlight">Tyler Davis</strong> is ready</p>
+                                    <p class="activity-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 2 min ago &bull; CBC Panel</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <div class="activity-dot dot-pink"></div>
                                 <div class="activity-text">
-                                    <p class="activity-main"><strong>Dylan Thompson</strong> sent a message</p>
-                                    <p class="activity-time">15 min ago</p>
+                                    <p class="activity-main"><strong class="patient-name-highlight">Dylan Thompson</strong> sent a message</p>
+                                    <p class="activity-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 15 min ago &bull; Rx Renewal</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <div class="activity-dot dot-blue"></div>
                                 <div class="activity-text">
-                                    <p class="activity-main">Appointment confirmed: <strong>Mike Nolan</strong></p>
-                                    <p class="activity-time">1 hr ago</p>
+                                    <p class="activity-main">Appointment confirmed: <strong class="patient-name-highlight">Mike Nolan</strong></p>
+                                    <p class="activity-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 1 hr ago &bull; Oct 9 at 9:00 AM</p>
                                 </div>
                             </div>
                             <div class="activity-item">
                                 <div class="activity-dot dot-teal"></div>
                                 <div class="activity-text">
-                                    <p class="activity-main">New patient: <strong>John Martinez</strong></p>
-                                    <p class="activity-time">3 hrs ago</p>
+                                    <p class="activity-main">New patient registered: <strong class="patient-name-highlight">John Martinez</strong></p>
+                                    <p class="activity-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 3 hrs ago &bull; Intake Completed</p>
                                 </div>
                             </div>
                             <div class="activity-item">
-                                <div class="activity-dot dot-pink"></div>
+                                <div class="activity-dot dot-amber"></div>
                                 <div class="activity-text">
-                                    <p class="activity-main">Prescription updated: <strong>Ashley Martinez</strong></p>
-                                    <p class="activity-time">5 hrs ago</p>
+                                    <p class="activity-main">Prescription updated: <strong class="patient-name-highlight">Ashley Martinez</strong></p>
+                                    <p class="activity-time"><i data-lucide="clock" style="width:11px;height:11px;"></i> 5 hrs ago &bull; Lisinopril 10mg</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bottom Row -->
+                <!-- Bottom Row (Reverted to clean light card design) -->
                 <div class="overview-bottom-row">
                     <div class="overview-card flex-1">
-                        <div class="header"><h1>Patient Demographics</h1></div>
+                        <div class="header">
+                            <h1>Patient Demographics</h1>
+                            <span class="card-chip" id="demo-total-chip">1,284 Active</span>
+                        </div>
                         <div class="demographics-list">
                             <div class="demo-row">
-                                <p>Male</p>
-                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-blue" style="width:52%"></div></div>
-                                <p>52%</p>
+                                <span class="demo-label">Male</span>
+                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-blue" id="demo-bar-male" style="width:52%"></div></div>
+                                <span class="demo-percent" id="demo-pct-male">52%</span>
                             </div>
                             <div class="demo-row">
-                                <p>Female</p>
-                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-pink" style="width:44%"></div></div>
-                                <p>44%</p>
+                                <span class="demo-label">Female</span>
+                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-pink" id="demo-bar-female" style="width:44%"></div></div>
+                                <span class="demo-percent" id="demo-pct-female">44%</span>
                             </div>
                             <div class="demo-row">
-                                <p>Other</p>
-                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" style="width:4%"></div></div>
-                                <p>4%</p>
+                                <span class="demo-label">Other</span>
+                                <div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" id="demo-bar-other" style="width:4%"></div></div>
+                                <span class="demo-percent" id="demo-pct-other">4%</span>
                             </div>
                         </div>
                         <div class="age-groups">
-                            <h4>Age Groups</h4>
-                            <div class="age-row"><span class="age-label">0-17</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" style="width:15%"></div></div><span>15%</span></div>
-                            <div class="age-row"><span class="age-label">18-40</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-blue" style="width:38%"></div></div><span>38%</span></div>
-                            <div class="age-row"><span class="age-label">41-65</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-pink" style="width:32%"></div></div><span>32%</span></div>
-                            <div class="age-row"><span class="age-label">65+</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" style="width:15%"></div></div><span>15%</span></div>
+                            <h4>Age Distribution</h4>
+                            <div class="age-row"><span class="age-label">0–17</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-teal" id="age-bar-0-17" style="width:15%"></div></div><span class="age-val" id="age-val-0-17">15%</span></div>
+                            <div class="age-row"><span class="age-label">18–40</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-blue" id="age-bar-18-40" style="width:38%"></div></div><span class="age-val" id="age-val-18-40">38%</span></div>
+                            <div class="age-row"><span class="age-label">41–65</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-pink" id="age-bar-41-65" style="width:32%"></div></div><span class="age-val" id="age-val-41-65">32%</span></div>
+                            <div class="age-row"><span class="age-label">65+</span><div class="demo-bar-wrap"><div class="demo-bar demo-bar-amber" id="age-bar-65-plus" style="width:15%"></div></div><span class="age-val" id="age-val-65-plus">15%</span></div>
                         </div>
                     </div>
+
                     <div class="overview-card flex-1">
-                        <div class="header"><h1>Common Diagnoses</h1></div>
-                        <div class="diagnoses-list">
+                        <div class="header">
+                            <h1>Prevalent Diagnoses</h1>
+                            <span class="card-chip">Top Conditions</span>
+                        </div>
+                        <div class="diagnoses-list" id="overview-diagnoses-list">
                             <div class="diagnoses-item">
-                                <div class="diagnoses-left"><div class="diag-dot" style="background:#E66FD2"></div><p>Hypertension</p></div>
-                                <p class="diag-count">312 patients</p>
+                                <div class="diagnoses-row-top">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#E66FD2"></div><span class="diag-name">Hypertension</span></div>
+                                    <span class="diag-count-pill">312 patients &bull; 24.3%</span>
+                                </div>
+                                <div class="diag-bar-track"><div class="diag-bar-fill" style="width:65%;background:linear-gradient(90deg, #E66FD2, #F472B6)"></div></div>
                             </div>
                             <div class="diagnoses-item">
-                                <div class="diagnoses-left"><div class="diag-dot" style="background:#8C6FE6"></div><p>Type 2 Diabetes</p></div>
-                                <p class="diag-count">218 patients</p>
+                                <div class="diagnoses-row-top">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#8C6FE6"></div><span class="diag-name">Type 2 Diabetes</span></div>
+                                    <span class="diag-count-pill">218 patients &bull; 17.0%</span>
+                                </div>
+                                <div class="diag-bar-track"><div class="diag-bar-fill" style="width:50%;background:linear-gradient(90deg, #8C6FE6, #A78BFA)"></div></div>
                             </div>
                             <div class="diagnoses-item">
-                                <div class="diagnoses-left"><div class="diag-dot" style="background:#01F0D0"></div><p>Asthma</p></div>
-                                <p class="diag-count">174 patients</p>
+                                <div class="diagnoses-row-top">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#01F0D0"></div><span class="diag-name">Asthma</span></div>
+                                    <span class="diag-count-pill">174 patients &bull; 13.5%</span>
+                                </div>
+                                <div class="diag-bar-track"><div class="diag-bar-fill" style="width:40%;background:linear-gradient(90deg, #01F0D0, #00C4A7)"></div></div>
                             </div>
                             <div class="diagnoses-item">
-                                <div class="diagnoses-left"><div class="diag-dot" style="background:#FFB347"></div><p>Anxiety Disorder</p></div>
-                                <p class="diag-count">156 patients</p>
+                                <div class="diagnoses-row-top">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#FFB347"></div><span class="diag-name">Anxiety Disorder</span></div>
+                                    <span class="diag-count-pill">156 patients &bull; 12.1%</span>
+                                </div>
+                                <div class="diag-bar-track"><div class="diag-bar-fill" style="width:35%;background:linear-gradient(90deg, #FFB347, #FBBF24)"></div></div>
                             </div>
                             <div class="diagnoses-item">
-                                <div class="diagnoses-left"><div class="diag-dot" style="background:#6FA8E6"></div><p>Hyperlipidemia</p></div>
-                                <p class="diag-count">129 patients</p>
+                                <div class="diagnoses-row-top">
+                                    <div class="diagnoses-left"><div class="diag-dot" style="background:#6FA8E6"></div><span class="diag-name">Hyperlipidemia</span></div>
+                                    <span class="diag-count-pill">129 patients &bull; 10.0%</span>
+                                </div>
+                                <div class="diag-bar-track"><div class="diag-bar-fill" style="width:28%;background:linear-gradient(90deg, #6FA8E6, #93C5FD)"></div></div>
                             </div>
                         </div>
                     </div>

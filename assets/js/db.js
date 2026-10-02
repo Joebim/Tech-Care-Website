@@ -123,7 +123,8 @@ const TechCareDB = (() => {
         deleteAppointment:     (id)      => del('appointments', id),
 
         // Messages
-        getMessages: (patientName) => getByIndex('messages', 'patientName', patientName),
-        addMessage:  (msg)         => add('messages', msg),
+        getMessages:    (patientName) => getByIndex('messages', 'patientName', patientName),
+        getAllMessages: ()            => getAll('messages'),
+        addMessage:     (msg)         => add('messages', msg),
     };
 })();
