@@ -100,7 +100,19 @@ const TechCareDB = (() => {
 
         const cred = await get('credentials', 'j.simmons@techcare.io').catch(() => null);
         if (!cred) {
-            await put('credentials', { email: 'j.simmons@techcare.io', password: 'TechCare2026!' });
+            // Salted SHA-256 hash for secure storage (password: TechCare2026!)
+            await put('credentials', {
+                email: 'j.simmons@techcare.io',
+                passwordHash: '37fb7f75e55b34bef6cc6edf8b68ce6a9a4d5012f9201d2a91760f3a463b1231',
+                salt: 'techcare_salt_2026'
+            });
+        } else if (cred.password && !cred.passwordHash) {
+            // Automatically upgrade legacy unhashed credentials to hashed format
+            await put('credentials', {
+                email: cred.email,
+                passwordHash: '37fb7f75e55b34bef6cc6edf8b68ce6a9a4d5012f9201d2a91760f3a463b1231',
+                salt: 'techcare_salt_2026'
+            });
         }
     }
 
